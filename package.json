@@ -2,6 +2,7 @@
   "name": "project-infinity-migrate",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "repository": "git@github.com:Monday-Morning/project-infinity-migrate.git",
   "author": "Rutaj Dash <33367546+rutajdash@users.noreply.github.com>",
   "license": "MIT",
