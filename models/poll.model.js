@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Poll Model
  * @constant PollSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const PollSchema = new Schema(
+const PollSchema = new mongoose.Schema(
   {
     question: [
       {
@@ -52,19 +52,19 @@ const PollSchema = new Schema(
     },
     article: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Article',
         required: false,
       },
     ],
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -88,6 +88,6 @@ const PollSchema = new Schema(
  * @description Generated Poll Model
  * @constant PollModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Poll', PollSchema);
+export default mongoose.model('Poll', PollSchema);

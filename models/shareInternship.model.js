@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Share Internship Model
  * @constant ShareInternshipSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const ShareInternshipSchema = new Schema(
+const ShareInternshipSchema = new mongoose.Schema(
   {
     internYear: {
       type: Number,
@@ -37,7 +37,7 @@ const ShareInternshipSchema = new Schema(
         max: 6,
       },
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
       },
@@ -55,7 +55,7 @@ const ShareInternshipSchema = new Schema(
       },
       /** if company is registred */
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Company',
         required: false,
       },
@@ -86,13 +86,13 @@ const ShareInternshipSchema = new Schema(
       default: false,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -116,6 +116,6 @@ const ShareInternshipSchema = new Schema(
  * @description Generated Share Internship Model
  * @constant ShareInternshipModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('ShareInternship', ShareInternshipSchema);
+export default mongoose.model('ShareInternship', ShareInternshipSchema);

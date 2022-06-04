@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Forum Message Model
  * @constant ForumMessageSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const ForumMessageSchema = new Schema(
+const ForumMessageSchema = new mongoose.Schema(
   {
     // TODO: update with standard structure
     content: [
@@ -33,7 +33,7 @@ const ForumMessageSchema = new Schema(
         trim: true,
       },
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
       },
@@ -50,18 +50,18 @@ const ForumMessageSchema = new Schema(
       default: false,
     },
     parentThread: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'ForumThread',
       required: true,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -85,6 +85,6 @@ const ForumMessageSchema = new Schema(
  * @description Generated Forum Message Model
  * @constant ForumMessageModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('ForumMessage', ForumMessageSchema);
+export default mongoose.model('ForumMessage', ForumMessageSchema);

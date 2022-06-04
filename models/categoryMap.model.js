@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Category Map Model
  * @constant CategoryMapSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const CategoryMapSchema = new Schema(
+const CategoryMapSchema = new mongoose.Schema(
   {
     number: {
       type: Number,
@@ -36,19 +36,19 @@ const CategoryMapSchema = new Schema(
         min: 0,
       },
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'CategoryMap',
         required: false,
       },
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -72,6 +72,6 @@ const CategoryMapSchema = new Schema(
  * @description Generated Category Map Model
  * @constant CategoryMapModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('CategoryMap', CategoryMapSchema);
+export default mongoose.model('CategoryMap', CategoryMapSchema);

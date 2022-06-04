@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Event Model
  * @constant EventSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const EventSchema = new Schema(
+const EventSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -33,7 +33,7 @@ const EventSchema = new Schema(
       required: true,
     },
     poster: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Media',
       required: false,
     },
@@ -46,7 +46,7 @@ const EventSchema = new Schema(
       max: 3,
     },
     host: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Club',
       required: false,
     },
@@ -67,13 +67,13 @@ const EventSchema = new Schema(
       default: 0,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -97,6 +97,6 @@ const EventSchema = new Schema(
  * @description Generated Event Model
  * @constant EventModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Event', EventSchema);
+export default mongoose.model('Event', EventSchema);

@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Tag Model
  * @constant TagModel
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const TagSchema = new Schema(
+const TagSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -38,13 +38,13 @@ const TagSchema = new Schema(
       maxLength: 6,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -68,6 +68,6 @@ const TagSchema = new Schema(
  * @description Generated Tag Model
  * @constant TagModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Tag', TagSchema);
+export default mongoose.model('Tag', TagSchema);

@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Role Model
  * @constant RoleSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const RoleSchema = new Schema(
+const RoleSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -38,13 +38,13 @@ const RoleSchema = new Schema(
       trim: true,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -68,6 +68,6 @@ const RoleSchema = new Schema(
  * @description Generated Role Model
  * @constant RoleModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Role', RoleSchema);
+export default mongoose.model('Role', RoleSchema);

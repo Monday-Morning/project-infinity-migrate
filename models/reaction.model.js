@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Reaction Model
  * @constant ReactionSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const ReactionSchema = new Schema(
+const ReactionSchema = new mongoose.Schema(
   {
     /** [0 - Like, 1 - Upvote] */
     type: {
@@ -28,7 +28,7 @@ const ReactionSchema = new Schema(
     },
     // TODO: create redundancy if needed
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
@@ -39,19 +39,19 @@ const ReactionSchema = new Schema(
         enum: ['Article', 'Comment'],
       },
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         refPath: 'parent.model',
         required: true,
       },
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -75,6 +75,6 @@ const ReactionSchema = new Schema(
  * @description Generated Reaction Model
  * @constant ReactionModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Reaction', ReactionSchema);
+export default mongoose.model('Reaction', ReactionSchema);

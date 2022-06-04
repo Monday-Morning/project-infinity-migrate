@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Issue Model
  * @constant IssueSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const IssueSchema = new Schema(
+const IssueSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -62,26 +62,26 @@ const IssueSchema = new Schema(
     },
     articles: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Article',
         required: false,
       },
     ],
     featured: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Article',
         required: false,
       },
     ],
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -105,6 +105,6 @@ const IssueSchema = new Schema(
  * @description Generated Issue Model
  * @constant IssueModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Issue', IssueSchema);
+export default mongoose.model('Issue', IssueSchema);

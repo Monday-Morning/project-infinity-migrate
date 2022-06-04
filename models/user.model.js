@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for User Model
  * @constant UserSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const UserSchema = new Schema(
+const UserSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -140,7 +140,7 @@ const UserSchema = new Schema(
           enum: ['Article', 'Media'],
         },
         reference: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           refPath: 'contributions.model',
           required: false,
         },
@@ -174,7 +174,7 @@ const UserSchema = new Schema(
     },
     /** @see module:app.models.poll */
     lastPoll: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Poll',
       required: false,
     },
@@ -187,13 +187,13 @@ const UserSchema = new Schema(
       required: false,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -227,6 +227,6 @@ UserSchema.virtual('fullName')
  * @description Generated User Model
  * @constant UserModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('User', UserSchema);
+export default mongoose.model('User', UserSchema);

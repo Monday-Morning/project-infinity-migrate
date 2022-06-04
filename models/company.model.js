@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Company Model
  * @constant CompanySchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const CompanySchema = new Schema(
+const CompanySchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -37,18 +37,18 @@ const CompanySchema = new Schema(
       trim: true,
     },
     logo: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Media',
       required: true,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -72,6 +72,6 @@ const CompanySchema = new Schema(
  * @description Generated Company Model
  * @constant CompanyModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Company', CompanySchema);
+export default mongoose.model('Company', CompanySchema);

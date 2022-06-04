@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Live Model
  * @constant LiveSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const LiveSchema = new Schema(
+const LiveSchema = new mongoose.Schema(
   {
     /** [0-3 - Category 0-3, 4 - Internship] */
     type: {
@@ -27,7 +27,7 @@ const LiveSchema = new Schema(
       max: 4,
     },
     company: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Company',
       required: true,
     },
@@ -80,13 +80,13 @@ const LiveSchema = new Schema(
       required: true,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -114,6 +114,6 @@ LiveSchema.virtual('internshipDuration')
  * @description Generated Live Model
  * @constant LiveModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Live', LiveSchema);
+export default mongoose.model('Live', LiveSchema);

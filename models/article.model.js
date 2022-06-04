@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Article Model
  * @constant ArticleSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const ArticleSchema = new Schema(
+const ArticleSchema = new mongoose.Schema(
   {
     /** [0 - Normal Article, 1 - Witsdom, 2 - Photostory] */
     articleType: {
@@ -54,7 +54,7 @@ const ArticleSchema = new Schema(
           max: 3,
         },
         details: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
           required: true,
         },
@@ -72,7 +72,7 @@ const ArticleSchema = new Schema(
           min: 0,
         },
         reference: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'CategoryMap',
           required: true,
         },
@@ -91,7 +91,7 @@ const ArticleSchema = new Schema(
           default: false,
         },
         reference: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'Tag',
           required: true,
         },
@@ -99,12 +99,12 @@ const ArticleSchema = new Schema(
     ],
     coverMedia: {
       square: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Media',
         required: false,
       },
       rectangle: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Media',
         required: false,
       },
@@ -140,7 +140,7 @@ const ArticleSchema = new Schema(
         },
         /** Only for image type */
         media: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'Media',
           required: false,
         },
@@ -261,13 +261,13 @@ const ArticleSchema = new Schema(
       default: 0,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -291,6 +291,6 @@ const ArticleSchema = new Schema(
  * @description Generated Article Model
  * @constant ArticleModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Article', ArticleSchema);
+export default mongoose.model('Article', ArticleSchema);

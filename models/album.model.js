@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Album Model
  * @constant AlbumSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const AlbumSchema = new Schema(
+const AlbumSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -32,20 +32,20 @@ const AlbumSchema = new Schema(
           trim: true,
         },
         reference: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'Tag',
           required: false,
         },
       },
     ],
     cover: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Media',
       required: true,
     },
     media: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Media',
         required: true,
       },
@@ -57,7 +57,7 @@ const AlbumSchema = new Schema(
           required: true,
         },
         details: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
           required: true,
         },
@@ -70,13 +70,13 @@ const AlbumSchema = new Schema(
       default: 0,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -100,6 +100,6 @@ const AlbumSchema = new Schema(
  * @description Generated Album Model
  * @constant AlbumModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Album', AlbumSchema);
+export default mongoose.model('Album', AlbumSchema);

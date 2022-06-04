@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Forum Thread Model
  * @constant ForumThreadSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const ForumThreadSchema = new Schema(
+const ForumThreadSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -38,7 +38,7 @@ const ForumThreadSchema = new Schema(
         trim: true,
       },
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
       },
@@ -78,19 +78,19 @@ const ForumThreadSchema = new Schema(
         max: 2,
       },
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'ThreadMessage',
         required: false,
       },
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -114,6 +114,6 @@ const ForumThreadSchema = new Schema(
  * @description Generated Forum Thread Model
  * @constant ForumThreadModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('ForumThread', ForumThreadSchema);
+export default mongoose.model('ForumThread', ForumThreadSchema);

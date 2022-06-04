@@ -1,13 +1,13 @@
 import fetch from 'node-fetch';
 import { encode } from 'blurhash';
-import { loadImage, createCanvas } from 'canvas';
+import * as canvas from 'canvas';
 import { adamantiumA, infinityA } from '../config/imagekit.js';
 import sharp from 'sharp';
 
 import Logger from '../utils/winston.js';
 const log = new Logger('Media Migrate');
 
-import { deleteOne, deleteMany } from '../models/media.model.js';
+import mediaModel from '../models/media.model.js';
 
 async function downloadImage(imageUrl) {
   const _res = await fetch(imageUrl);
@@ -15,14 +15,14 @@ async function downloadImage(imageUrl) {
 }
 
 function getImageData(image) {
-  const _canvas = createCanvas(image.width, image.height);
+  const _canvas = canvas.createCanvas(image.width, image.height);
   const _context = _canvas.getContext('2d');
   _context.drawImage(image, 0, 0);
   return _context.getImageData(0, 0, image.width, image.height);
 }
 
 async function encodeImageToBlurhash(imageBuffer) {
-  const _image = await loadImage(imageBuffer);
+  const _image = await canvas.loadImage(imageBuffer);
   const _imageData = getImageData(_image);
   return encode(_imageData.data, _imageData.width, _imageData.height, 4, 4).toString().trim();
 }
@@ -90,7 +90,7 @@ export async function deleteSingleImage(imageFileName, newStore, recordId) {
           searchQuery: `name = "${imageFileName}"`,
         });
     return Promise.all([
-      recordId ? deleteOne({ _id: recordId }) : Promise.resolve(),
+      recordId ? mediaModel.deleteOne({ _id: recordId }) : Promise.resolve(),
       newStore ? infinityA.deleteFile(_file.fileId) : adamantiumA.deleteFile(_file.fileId),
     ]);
   } catch (error) {
@@ -108,7 +108,7 @@ export async function deleteManyImages(imageFileNames, newStore, recordIds) {
         searchQuery: `name IN [${imageFileNames.toString()}]`,
       });
   return Promise.all([
-    recordIds ? deleteMany({ _id: recordIds }) : Promise.resolve(),
+    recordIds ? mediaModel.deleteMany({ _id: recordIds }) : Promise.resolve(),
     newStore
       ? infinityA.bulkDeleteFiles(_files.map((item) => item.fileId))
       : adamantiumA.bulkDeleteFiles(_files.map((item) => item.fileId)),

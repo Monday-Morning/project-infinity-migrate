@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Comment Model
  * @constant CommentSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const CommentSchema = new Schema(
+const CommentSchema = new mongoose.Schema(
   {
     // TODO: update content with final structure
     content: [
@@ -33,7 +33,7 @@ const CommentSchema = new Schema(
         trim: true,
       },
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         trim: true,
       },
@@ -45,19 +45,19 @@ const CommentSchema = new Schema(
         enum: ['Article', 'Comment'],
       },
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         refPath: 'parent.model',
         required: true,
       },
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -81,6 +81,6 @@ const CommentSchema = new Schema(
  * @description Generated Comment Model
  * @constant CommentModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Comment', CommentSchema);
+export default mongoose.model('Comment', CommentSchema);

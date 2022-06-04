@@ -9,28 +9,28 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Squiggle Model
  * @constant SquiggleSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const SquiggleSchema = new Schema(
+const SquiggleSchema = new mongoose.Schema(
   {
     content: {
       type: String,
       required: true,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -54,6 +54,6 @@ const SquiggleSchema = new Schema(
  * @description Generated Squiggle Model
  * @constant SquiggleModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Squiggle', SquiggleSchema);
+export default mongoose.model('Squiggle', SquiggleSchema);

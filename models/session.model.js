@@ -9,15 +9,15 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Session Model
  * @constant SessionSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const SessionSchema = new Schema(
+const SessionSchema = new mongoose.Schema(
   {
     startTS: {
       type: Date,
@@ -29,7 +29,7 @@ const SessionSchema = new Schema(
     },
     issues: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Issue',
       },
     ],
@@ -56,12 +56,12 @@ const SessionSchema = new Schema(
           trim: true,
         },
         picture: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'Media',
           required: false,
         },
         reference: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
           required: false,
         },
@@ -84,13 +84,13 @@ const SessionSchema = new Schema(
       },
     ],
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -114,6 +114,6 @@ const SessionSchema = new Schema(
  * @description Generated Session Model
  * @constant SessionModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Session', SessionSchema);
+export default mongoose.model('Session', SessionSchema);

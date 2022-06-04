@@ -1,4 +1,4 @@
-import { connect, connection as _connection, Mongoose, Types } from 'mongoose';
+import mongoose from 'mongoose';
 
 import Logger from '../utils/winston.js';
 const logger = new Logger('Mongoose');
@@ -8,19 +8,20 @@ export function init() {
     maxPoolSize: 10,
     minPoolSize: 1,
   };
-  connect(process.env.MONGO_URL, MONGOOSE_OPTIONS)
+  mongoose
+    .connect(process.env.MONGO_URL, MONGOOSE_OPTIONS)
     .then(() => logger.info('Database Connected'))
     .catch((err) => logger.error('Could not connect to database: ', err));
 }
 
-export const connection = _connection.readyState !== 1 ? _connection : null;
+export const connection = mongoose.connection?.readyState !== 1 ? mongoose.connection : null;
 
 export function isValidObjectId(id) {
-  if (Types.ObjectId.isValid(id)) {
+  if (mongoose.Types.ObjectId.isValid(id)) {
     if (String(new ObjectId(id)) === id) return true;
     return false;
   }
   return false;
 }
 
-export default Mongoose;
+export default mongoose.Mongoose;

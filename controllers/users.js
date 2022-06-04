@@ -5,12 +5,7 @@ import { isValidObjectId } from '../config/mongoose.js';
 import Logger from '../utils/winston.js';
 const log = new Logger('User Migrate');
 
-import {
-  deleteOne as deleteOneUser,
-  create as createUser,
-  findByIdAndUpdate as findByIdAndUpdateUser,
-  findById as findUserById,
-} from '../models/user.model.js';
+import userModel from '../models/user.model.js';
 import { deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePicture } from './media.js';
 
 function getListOfRecords(startId = 0, endId = 10000) {
@@ -55,17 +50,17 @@ function convertRecordToDocument(oldUser, picture) {
 }
 
 function createDocument(newUser) {
-  return createUser(newUser);
+  return userModel.create(newUser);
 }
 
 function updateDocument(id, newUser) {
-  return findByIdAndUpdateUser(id, newUser, { new: true });
+  return userModel.findByIdAndUpdate(id, newUser, { new: true });
 }
 
 export function cleanSingleMigration(oldId, newId) {
   return Promise.all([
     updateMapping(oldId, ''),
-    deleteOneUser({ _id: newId }),
+    userModel.deleteOne({ _id: newId }),
     deleteSingleImage(`${newId}.jpeg`, true),
   ]);
 }
@@ -85,7 +80,7 @@ export async function migrateSingle(oldId) {
     log.info(`ID #${oldId} | Checking past migration...`);
     const [_oldUser] = getRecord(oldId);
     if (isValidObjectId(_oldUser.mongo_id)) {
-      const _deleteRecord = await findUserById(_oldUser.mongo_id);
+      const _deleteRecord = await userModel.findById(_oldUser.mongo_id);
       if (_deleteRecord) {
         log.info(`ID #${oldId} | Found past migration! Cleaning...`);
         await cleanSingleMigration(oldId, _oldUser.mongo_id);

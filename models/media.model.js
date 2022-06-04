@@ -9,20 +9,20 @@
  * @since 0.1.0
  */
 
-import { Schema, model, Model as _Model, Types } from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * @description The schema definition for Media Model
  * @constant MediaSchema
  *
- * @type {Schema}
+ * @type {mongoose.Schema}
  */
-const MediaSchema = new Schema(
+const MediaSchema = new mongoose.Schema(
   {
     _id: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: false,
-      default: Types.ObjectId(),
+      default: mongoose.Types.ObjectId(),
       trim: true,
     },
     authors: [
@@ -33,7 +33,7 @@ const MediaSchema = new Schema(
           trim: true,
         },
         details: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
           required: true,
         },
@@ -68,7 +68,7 @@ const MediaSchema = new Schema(
     },
     linkedTo: {
       reference: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         required: false,
         refPath: 'linkedTo.onModel',
       },
@@ -79,13 +79,13 @@ const MediaSchema = new Schema(
       },
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false,
       default: null,
@@ -109,6 +109,6 @@ const MediaSchema = new Schema(
  * @description Generated Media Model
  * @constant MediaModel
  *
- * @type {_Model}
+ * @type {mongoose.Model}
  */
-export default model('Media', MediaSchema);
+export default mongoose.model('Media', MediaSchema);
