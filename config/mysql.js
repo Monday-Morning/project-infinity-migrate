@@ -1,6 +1,6 @@
 import { createConnection } from 'mysql';
 
-import Logger from '../utils/logger';
+import Logger from '../utils/winston.js';
 const logger = new Logger('MySQL');
 
 export function init() {

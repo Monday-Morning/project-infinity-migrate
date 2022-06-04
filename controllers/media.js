@@ -1,13 +1,13 @@
 import fetch from 'node-fetch';
 import { encode } from 'blurhash';
 import { loadImage, createCanvas } from 'canvas';
-import { adamantiumA, infinityA } from '../config/imagekit';
+import { adamantiumA, infinityA } from '../config/imagekit.js';
 import sharp from 'sharp';
 
-import Logger from '../utils/logger';
+import Logger from '../utils/winston.js';
 const log = new Logger('Media Migrate');
 
-import { deleteOne, deleteMany } from '../models/media.model';
+import { deleteOne, deleteMany } from '../models/media.model.js';
 
 async function downloadImage(imageUrl) {
   const _res = await fetch(imageUrl);

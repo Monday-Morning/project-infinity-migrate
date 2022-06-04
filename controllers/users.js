@@ -1,8 +1,8 @@
-import { performQuery } from '../config/mysql';
+import { performQuery } from '../config/mysql.js';
 import { eachOfSeries } from 'async';
-import { isValidObjectId } from '../config/mongoose';
+import { isValidObjectId } from '../config/mongoose.js';
 
-import Logger from '../utils/logger';
+import Logger from '../utils/winston.js';
 const log = new Logger('User Migrate');
 
 import {
@@ -10,8 +10,8 @@ import {
   create as createUser,
   findByIdAndUpdate as findByIdAndUpdateUser,
   findById as findUserById,
-} from '../models/user.model';
-import { deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePicture } from './media';
+} from '../models/user.model.js';
+import { deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePicture } from './media.js';
 
 function getListOfRecords(startId = 0, endId = 10000) {
   return performQuery(

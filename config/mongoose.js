@@ -1,6 +1,6 @@
 import { connect, connection as _connection, Mongoose, Types } from 'mongoose';
 
-import Logger from '../utils/logger';
+import Logger from '../utils/winston.js';
 const logger = new Logger('Mongoose');
 
 export function init() {

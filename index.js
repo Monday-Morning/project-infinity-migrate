@@ -1,5 +1,5 @@
 // Load logger
-import Winston from './utils/winston';
+import Winston from './utils/winston.js';
 const log = new Winston('Main');
 
 // Load environment variables
@@ -9,9 +9,9 @@ import('dotenv')
 
 // Import all modules
 import express from 'express';
-import { init as initMongoose } from './config/mongoose';
-import { init as initMysql } from './config/mysql';
-import { migrateMany as migrateManyUsers, migrateSingle as migrateSingleUser } from './controllers/users';
+import { init as initMongoose } from './config/mongoose.js';
+import { init as initMysql } from './config/mysql.js';
+import { migrateMany as migrateManyUsers, migrateSingle as migrateSingleUser } from './controllers/users.js';
 
 log.info(`Initializing Mongoose...`);
 initMongoose();
