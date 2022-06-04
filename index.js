@@ -3,21 +3,14 @@ import 'dotenv/config';
 
 // Import all modules
 import express from 'express';
-import { init as initMongoose } from './config/mongoose.js';
-import { init as initMysql } from './config/mysql.js';
+import './config/mongoose.js';
+import './config/mysql.js';
 import { migrateMany as migrateManyUsers, migrateSingle as migrateSingleUser } from './controllers/users.js';
 
 // Load logger
 import Winston from './utils/winston.js';
 const log = new Winston('Main');
 
-log.info(`Initializing Mongoose...`);
-initMongoose();
-
-log.info(`Initializing MySQL...`);
-initMysql();
-
-log.info(`Initializing Express...`);
 const app = express();
 
 async function requestHandler(methodResponse, sendResponse) {
