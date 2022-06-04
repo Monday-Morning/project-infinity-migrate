@@ -15,7 +15,7 @@ import { deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePictur
 
 function getListOfRecords(startId = 0, endId = 10000) {
   return performQuery(
-    `SELECT user_id, mongo_id FROM users WHERE user_role > 0 AND user_id > ${startId} AND user_id < ${endId} ORDER BY user_id ASC;`
+    `SELECT user_id, mongo_id FROM users WHERE user_role > 0 AND user_id >= ${startId} AND user_id =< ${endId} ORDER BY user_id ASC;`
   );
 }
 
