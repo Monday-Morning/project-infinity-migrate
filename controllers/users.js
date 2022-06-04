@@ -1,0 +1,169 @@
+import { performQuery } from '../config/mysql';
+import { eachOfSeries } from 'async';
+import { isValidObjectId } from '../config/mongoose';
+
+import Logger from '../utils/logger';
+const log = new Logger('User Migrate');
+
+import {
+  deleteOne as deleteOneUser,
+  create as createUser,
+  findByIdAndUpdate as findByIdAndUpdateUser,
+  findById as findUserById,
+} from '../models/user.model';
+import { deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePicture } from './media';
+
+function getListOfRecords(startId = 0, endId = 10000) {
+  return performQuery(
+    `SELECT user_id, mongo_id FROM users WHERE user_role > 0 AND user_id > ${startId} AND user_id < ${endId} ORDER BY user_id ASC;`
+  );
+}
+
+function getRecord(id) {
+  return performQuery(`SELECT * FROM users WHERE user_id="${id}";`);
+}
+
+function updateMapping(oldId, newId) {
+  return performQuery(`UPDATE users SET mongo_id="${newId}" WHERE user_id="${oldId}";`);
+}
+
+function convertRecordToDocument(oldUser, picture) {
+  return {
+    fullName: oldUser.user_display_name,
+    email: gmailRegex.test(oldUser.user_email)
+      ? oldUser.user_email
+      : gmailRegex.test(oldUser.user_login)
+      ? oldUser.user_login
+      : `transfer-${oldUser.user_login.toString().trim().replace(/\s|@/g, '')}@gmail.com`.replace(/\W@/g, '@'),
+    accountType: 2,
+    nitrMail: nitrMailRegex.test(oldUser.user_email)
+      ? oldUser.user_email
+      : nitrMailRegex.test(oldUser.user_login)
+      ? oldUser.user_login
+      : `transfer-${oldUser.user_login.toString().trim().replace(/\s|@/g, '')}@nitrkl.ac.in`.replace(/\W@/g, '@'),
+    picture,
+    oldUserId: oldUser.user_id,
+    oldUserName: oldUser.user_login,
+    isNewsletterSubscribed: true,
+    profile: {
+      bio: oldUser.user_bio || undefined,
+      facebook: oldUser.user_facebook || undefined,
+      twitter: oldUser.user_twitter || undefined,
+      website: oldUser.user_website || undefined,
+    },
+  };
+}
+
+function createDocument(newUser) {
+  return createUser(newUser);
+}
+
+function updateDocument(id, newUser) {
+  return findByIdAndUpdateUser(id, newUser, { new: true });
+}
+
+export function cleanSingleMigration(oldId, newId) {
+  return Promise.all([
+    updateMapping(oldId, ''),
+    deleteOneUser({ _id: newId }),
+    deleteSingleImage(`${newId}.jpeg`, true),
+  ]);
+}
+
+export function cleanManyMigrations(oldIds, newIds) {
+  return Promise.all([
+    performQuery(`UPDATE users SET mongo_id="" WHERE user_id IN ["${oldIds.join('","')}"];`),
+    deleteManyImages(
+      newIds.map((item) => `${item}.jpeg`),
+      true
+    ),
+  ]);
+}
+
+export async function migrateSingle(oldId) {
+  try {
+    log.info(`ID #${oldId} | Checking past migration...`);
+    const [_oldUser] = getRecord(oldId);
+    if (isValidObjectId(_oldUser.mongo_id)) {
+      const _deleteRecord = await findUserById(_oldUser.mongo_id);
+      if (_deleteRecord) {
+        log.info(`ID #${oldId} | Found past migration! Cleaning...`);
+        await cleanSingleMigration(oldId, _oldUser.mongo_id);
+      } else {
+        log.info(`ID #${oldId} | No past migration found!`);
+      }
+    } else {
+      log.info(`ID #${oldId} | No past migration found!`);
+    }
+
+    log.info(`ID #${oldId} | Checking for clashing Email IDs...`);
+    const _checkUser = _oldUser.user_email.includes('@gmail')
+      ? await findOne({
+          email: _oldUser.user_email,
+        })
+      : null;
+
+    log.info(`ID #${oldId} | Creating user record...`);
+    const _formattedUser = convertRecordToDocument(_oldUser, undefined);
+    const _newUser = !_checkUser?._id
+      ? await createDocument(_formattedUser)
+      : await updateDocument(_checkUser._id, _formattedUser);
+
+    log.info(`ID #${oldId} | Migrating profile picture...`);
+    const _profilePicture = _oldUser.user_display_picture
+      ? await migrateProfilePicture(
+          `https://ik.imagekit.io/infinityA/uploads/user/${fixExtension(fileName)}?tr=n-square`,
+          _newUser._id
+        )
+      : undefined;
+
+    if (_profilePicture) {
+      log.info(`ID #${oldId} | Updating user profile picture...`);
+      const _formattedUser1 = convertRecordToDocument(_oldUser, {
+        store: _profilePicture.store,
+        storePath: _profilePicture.storePath,
+        blurhash: _profilePicture.blurhash,
+      });
+      await updateDocument(_newUser._id, _formattedUser1);
+    } else {
+      log.info(`ID #${oldId} | No profile picture found!`);
+    }
+
+    log.info(`ID #${oldId} | Mapping user records...`);
+    await updateMapping(oldId, _newUser._id);
+
+    log.info(`ID #${oldId} | User Successfully Migrated!`);
+    return _newUser;
+  } catch (error) {
+    log.error(`Could not migrate user: `, error);
+    return null;
+  }
+}
+
+export async function migrateMany(startId, endId) {
+  try {
+    log.info(`Retrieving ids in range...`);
+    const _oldRecords = await getListOfRecords(startId, endId);
+    log.info(`Retrieved ${_oldRecords.length} users.`);
+
+    log.info(`Cleaning all past migrations...`);
+    await cleanManyMigrations(
+      _oldRecords.map((item) => item.user_id),
+      _oldRecords.map((item) => (item.mongo_id ? item.mongo_id : undefined))
+    );
+
+    const _newRecords = [];
+    await eachOfSeries(_oldRecords, async (oldRecord, index) => {
+      log.info(`ID #${oldRecord.user_id} | Processing #${index + 1} of ${_oldRecords.length} users.`);
+      const _newRecord = await migrateSingle(oldRecord.user_id);
+      _newRecords.push(_newRecord);
+      return _newRecord;
+    });
+
+    log.info(`All users migrated!`);
+    return _newRecords;
+  } catch (error) {
+    log.error(`Could not migrate users: `, error);
+    return null;
+  }
+}
