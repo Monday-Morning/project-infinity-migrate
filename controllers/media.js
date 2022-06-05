@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import { encode } from 'blurhash';
-import * as canvas from 'canvas';
+import canvas from 'canvas';
 import { adamantiumA, infinityA } from '../config/imagekit.js';
 import sharp from 'sharp';
 
@@ -101,17 +101,19 @@ export async function deleteSingleImage(imageFileName, newStore, recordId) {
 
 export async function deleteManyImages(imageFileNames, newStore, recordIds) {
   const _files = newStore
-    ? await infinityA.listFiles({
-        searchQuery: `name IN [${imageFileNames.toString()}]`,
-      })
-    : await adamantiumA.listFiles({
-        searchQuery: `name IN [${imageFileNames.toString()}]`,
-      });
+    ? (
+        await infinityA.listFiles({
+          searchQuery: `name IN [${imageFileNames.toString()}]`,
+        })
+      ).map((item) => item.fileId)
+    : (
+        await adamantiumA.listFiles({
+          searchQuery: `name IN [${imageFileNames.toString()}]`,
+        })
+      ).map((item) => item.fileId);
   return Promise.all([
     recordIds ? mediaModel.deleteMany({ _id: recordIds }) : Promise.resolve(),
-    newStore
-      ? infinityA.bulkDeleteFiles(_files.map((item) => item.fileId))
-      : adamantiumA.bulkDeleteFiles(_files.map((item) => item.fileId)),
+    newStore ? infinityA.bulkDeleteFiles(_files) : adamantiumA.bulkDeleteFiles(_files),
   ]);
 }
 
@@ -130,7 +132,7 @@ export async function migrateProfilePicture(imageUrl, id) {
     const _newMediaDocument = await createDocument(id, 'user', _convertedImageBuffer, _newFileName, true);
 
     log.info(`Uploading image...`);
-    await uploadImage('user', _convertedImageBuffer, _newFileName, ['user', [], true]);
+    await uploadImage('user', _convertedImageBuffer, _newFileName, ['user', [], true], true);
     log.info(`Image Uploaded.`);
 
     return _newMediaDocument;

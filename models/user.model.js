@@ -60,7 +60,6 @@ const UserSchema = new mongoose.Schema(
       store: {
         type: Number,
         required: false,
-        default: 2,
         min: 0,
         max: 2,
       },

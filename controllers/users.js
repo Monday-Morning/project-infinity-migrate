@@ -1,6 +1,7 @@
 import { performQuery } from '../config/mysql.js';
 import { eachOfSeries } from 'async';
 import { isValidObjectId } from '../config/mongoose.js';
+import { testGmail, testNitrMail } from '../utils/regex.js';
 
 import Logger from '../utils/winston.js';
 const log = new Logger('User Migrate');
@@ -10,7 +11,7 @@ import { deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePictur
 
 function getListOfRecords(startId = 0, endId = 10000) {
   return performQuery(
-    `SELECT user_id, mongo_id FROM users WHERE user_role > 0 AND user_id >= ${startId} AND user_id =< ${endId} ORDER BY user_id ASC;`
+    `SELECT user_id, mongo_id FROM users WHERE user_role > 0 AND user_id >= ${startId} AND user_id <= ${endId} ORDER BY user_id ASC;`
   );
 }
 
@@ -25,15 +26,15 @@ function updateMapping(oldId, newId) {
 function convertRecordToDocument(oldUser, picture) {
   return {
     fullName: oldUser.user_display_name,
-    email: gmailRegex.test(oldUser.user_email)
+    email: testGmail(oldUser.user_email)
       ? oldUser.user_email
-      : gmailRegex.test(oldUser.user_login)
+      : testGmail(oldUser.user_login)
       ? oldUser.user_login
       : `transfer-${oldUser.user_login.toString().trim().replace(/\s|@/g, '')}@gmail.com`.replace(/\W@/g, '@'),
     accountType: 2,
-    nitrMail: nitrMailRegex.test(oldUser.user_email)
+    nitrMail: testNitrMail(oldUser.user_email)
       ? oldUser.user_email
-      : nitrMailRegex.test(oldUser.user_login)
+      : testNitrMail(oldUser.user_login)
       ? oldUser.user_login
       : `transfer-${oldUser.user_login.toString().trim().replace(/\s|@/g, '')}@nitrkl.ac.in`.replace(/\W@/g, '@'),
     picture,
@@ -59,26 +60,30 @@ function updateDocument(id, newUser) {
 
 export function cleanSingleMigration(oldId, newId) {
   return Promise.all([
-    updateMapping(oldId, ''),
-    userModel.deleteOne({ _id: newId }),
-    deleteSingleImage(`${newId}.jpeg`, true),
+    oldId ? updateMapping(oldId, '') : Promise.resolve(),
+    newId ? userModel.deleteOne({ _id: newId }) : Promise.resolve(),
+    newId ? deleteSingleImage(`${newId}.jpeg`, true) : Promise.resolve(),
   ]);
 }
 
 export function cleanManyMigrations(oldIds, newIds) {
   return Promise.all([
-    performQuery(`UPDATE users SET mongo_id="" WHERE user_id IN ["${oldIds.join('","')}"];`),
-    deleteManyImages(
-      newIds.map((item) => `${item}.jpeg`),
-      true
-    ),
+    oldIds.length > 0
+      ? performQuery(`UPDATE users SET mongo_id="" WHERE user_id IN (${oldIds.join(',')});`)
+      : Promise.resolve(),
+    newIds.length > 0
+      ? deleteManyImages(
+          newIds.map((item) => `${item}.jpeg`),
+          true
+        )
+      : Promise.resolve(),
   ]);
 }
 
 export async function migrateSingle(oldId) {
   try {
     log.info(`ID #${oldId} | Checking past migration...`);
-    const [_oldUser] = getRecord(oldId);
+    const [_oldUser] = await getRecord(oldId);
     if (isValidObjectId(_oldUser.mongo_id)) {
       const _deleteRecord = await userModel.findById(_oldUser.mongo_id);
       if (_deleteRecord) {
@@ -93,7 +98,7 @@ export async function migrateSingle(oldId) {
 
     log.info(`ID #${oldId} | Checking for clashing Email IDs...`);
     const _checkUser = _oldUser.user_email.includes('@gmail')
-      ? await findOne({
+      ? await userModel.findOne({
           email: _oldUser.user_email,
         })
       : null;
@@ -107,7 +112,7 @@ export async function migrateSingle(oldId) {
     log.info(`ID #${oldId} | Migrating profile picture...`);
     const _profilePicture = _oldUser.user_display_picture
       ? await migrateProfilePicture(
-          `https://ik.imagekit.io/infinityA/uploads/user/${fixExtension(fileName)}?tr=n-square`,
+          `https://ik.imagekit.io/infinityA/uploads/user/${fixExtension(_oldUser.user_display_picture)}?tr=n-square`,
           _newUser._id
         )
       : undefined;
@@ -130,7 +135,7 @@ export async function migrateSingle(oldId) {
     log.info(`ID #${oldId} | User Successfully Migrated!`);
     return _newUser;
   } catch (error) {
-    log.error(`Could not migrate user: `, error);
+    log.error(`ID #${oldId} | Could not migrate user: `, error);
     return null;
   }
 }
@@ -143,8 +148,8 @@ export async function migrateMany(startId, endId) {
 
     log.info(`Cleaning all past migrations...`);
     await cleanManyMigrations(
-      _oldRecords.map((item) => item.user_id),
-      _oldRecords.map((item) => (item.mongo_id ? item.mongo_id : undefined))
+      _oldRecords.map((item) => item.user_id).filter((item) => item),
+      _oldRecords.map((item) => (item.mongo_id ? item.mongo_id : undefined)).filter((item) => item)
     );
 
     const _newRecords = [];

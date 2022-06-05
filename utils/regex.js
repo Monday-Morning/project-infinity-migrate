@@ -10,5 +10,5 @@ export function testGmail(gmailId) {
 }
 
 export function testNitrMail(nitrMail) {
-  return nitrMail.test(nitrMail);
+  return nitrMailRegex.test(nitrMail);
 }
