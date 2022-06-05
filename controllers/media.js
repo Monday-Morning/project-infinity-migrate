@@ -100,21 +100,44 @@ export async function deleteSingleImage(imageFileName, newStore, recordId) {
 }
 
 export async function deleteManyImages(imageFileNames, newStore, recordIds) {
-  const _files = newStore
-    ? await (
-        await infinityA.listFiles({
-          searchQuery: `name IN [${imageFileNames.toString()}]`,
-        })
-      ).map((item) => item.fileId)
-    : await (
-        await adamantiumA.listFiles({
-          searchQuery: `name IN [${imageFileNames.toString()}]`,
-        })
-      ).map((item) => item.fileId);
-  return Promise.all([
-    recordIds ? mediaModel.deleteMany({ _id: recordIds }) : Promise.resolve(),
-    newStore ? infinityA.bulkDeleteFiles(_files) : adamantiumA.bulkDeleteFiles(_files),
-  ]);
+  try {
+    const _files = newStore
+      ? await (
+          await infinityA.listFiles({
+            searchQuery: `name IN [${imageFileNames.toString()}]`,
+          })
+        ).map((item) => item.fileId)
+      : await (
+          await adamantiumA.listFiles({
+            searchQuery: `name IN [${imageFileNames.toString()}]`,
+          })
+        ).map((item) => item.fileId);
+    return Promise.all([
+      recordIds ? mediaModel.deleteMany({ _id: recordIds }) : Promise.resolve(),
+      newStore ? infinityA.bulkDeleteFiles(_files) : adamantiumA.bulkDeleteFiles(_files),
+    ]);
+  } catch (error) {
+    log.error(`Could not delete profile pictures: `, error);
+    return null;
+  }
+}
+
+export async function deleteAllImages(folderPath, newStore, recordLinkedTo) {
+  try {
+    return Promise.all([
+      newStore
+        ? infinityA.deleteFolder(folderPath).catch((error) => {
+            log.error(`Could not delete ImageKit folder: `, error);
+          })
+        : adamantiumA.deleteFolder(folderPath).catch((error) => {
+            log.error(`Could not delete ImageKit folder: `, error);
+          }),
+      recordLinkedTo ? mediaModel.deleteMany({ 'linkedTo.onModel': recordLinkedTo }) : Promise.resolve(),
+    ]);
+  } catch (error) {
+    log.error(`Could not delete folder: `, error);
+    return null;
+  }
 }
 
 export async function migrateProfilePicture(imageUrl, id) {
