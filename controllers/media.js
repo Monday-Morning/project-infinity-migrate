@@ -128,9 +128,11 @@ export async function deleteAllImages(folderPath, newStore, recordLinkedTo) {
       newStore
         ? infinityA.deleteFolder(folderPath).catch((error) => {
             log.error(`Could not delete ImageKit folder: `, error);
+            return Promise.resolve();
           })
         : adamantiumA.deleteFolder(folderPath).catch((error) => {
             log.error(`Could not delete ImageKit folder: `, error);
+            return Promise.resolve();
           }),
       recordLinkedTo ? mediaModel.deleteMany({ 'linkedTo.onModel': recordLinkedTo }) : Promise.resolve(),
     ]);

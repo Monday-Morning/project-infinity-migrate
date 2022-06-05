@@ -9,9 +9,11 @@ const log = new Logger('User Migrate');
 import userModel from '../models/user.model.js';
 import { deleteAllImages, deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePicture } from './media.js';
 
-function getListOfRecords(startId = 0, endId = 10000) {
+function getListOfRecords(startId, endId) {
   return performQuery(
-    `SELECT user_id, mongo_id FROM users WHERE user_role > 0 AND user_id >= ${startId} AND user_id <= ${endId} ORDER BY user_id ASC;`
+    `SELECT user_id, mongo_id FROM users WHERE user_role > 0 AND user_id >= ${startId ?? 0} AND user_id <= ${
+      endId ?? 10000
+    } ORDER BY user_id ASC;`
   );
 }
 
