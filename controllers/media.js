@@ -101,12 +101,12 @@ export async function deleteSingleImage(imageFileName, newStore, recordId) {
 
 export async function deleteManyImages(imageFileNames, newStore, recordIds) {
   const _files = newStore
-    ? (
+    ? await (
         await infinityA.listFiles({
           searchQuery: `name IN [${imageFileNames.toString()}]`,
         })
       ).map((item) => item.fileId)
-    : (
+    : await (
         await adamantiumA.listFiles({
           searchQuery: `name IN [${imageFileNames.toString()}]`,
         })
