@@ -83,7 +83,7 @@ export function cleanManyMigrations(oldIds, newIds) {
 }
 
 export function cleanAllMigrations() {
-  return Promise.all([performQuery(`UPDATE users SET mongo_id="");`), deleteAllImages('/user/', true)]);
+  return Promise.all([performQuery(`UPDATE users SET mongo_id="";`), deleteAllImages('/user/', true)]);
 }
 
 export async function migrateSingle(oldId) {
