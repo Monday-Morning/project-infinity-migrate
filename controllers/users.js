@@ -7,7 +7,7 @@ import Logger from '../utils/winston.js';
 const log = new Logger('User Migrate');
 
 import userModel from '../models/user.model.js';
-import { deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePicture } from './media.js';
+import { deleteAllImages, deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePicture } from './media.js';
 
 function getListOfRecords(startId = 0, endId = 10000) {
   return performQuery(
@@ -78,6 +78,10 @@ export function cleanManyMigrations(oldIds, newIds) {
         )
       : Promise.resolve(),
   ]);
+}
+
+export function cleanAllMigrations() {
+  return Promise.all([performQuery(`UPDATE users SET mongo_id="");`), deleteAllImages('/user/', true)]);
 }
 
 export async function migrateSingle(oldId) {
@@ -151,6 +155,31 @@ export async function migrateMany(startId, endId) {
       _oldRecords.map((item) => item.user_id).filter((item) => item),
       _oldRecords.map((item) => (item.mongo_id ? item.mongo_id : undefined)).filter((item) => item)
     );
+
+    const _newRecords = [];
+    await eachOfSeries(_oldRecords, async (oldRecord, index) => {
+      log.info(`ID #${oldRecord.user_id} | Processing #${index + 1} of ${_oldRecords.length} users.`);
+      const _newRecord = await migrateSingle(oldRecord.user_id);
+      _newRecords.push(_newRecord);
+      return _newRecord;
+    });
+
+    log.info(`All users migrated!`);
+    return _newRecords;
+  } catch (error) {
+    log.error(`Could not migrate users: `, error);
+    return null;
+  }
+}
+
+export async function migrateAll() {
+  try {
+    log.info(`Retrieving all ids...`);
+    const _oldRecords = await getListOfRecords();
+    log.info(`Retrieved ${_oldRecords.length} users.`);
+
+    log.info(`Cleaning all past migrations...`);
+    await cleanAllMigrations();
 
     const _newRecords = [];
     await eachOfSeries(_oldRecords, async (oldRecord, index) => {
