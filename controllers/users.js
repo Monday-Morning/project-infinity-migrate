@@ -12,7 +12,7 @@ import { deleteAllImages, deleteManyImages, deleteSingleImage, fixExtension, mig
 function getListOfRecords(startId, endId) {
   return performQuery(
     `SELECT user_id, mongo_id FROM users WHERE user_role > 0 AND user_id >= ${startId ?? 0} AND user_id <= ${
-      endId ?? 10000
+      endId ?? 1000000
     } ORDER BY user_id ASC;`
   );
 }

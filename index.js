@@ -6,6 +6,8 @@ import express from 'express';
 import './config/mongoose.js';
 import './config/mysql.js';
 import {
+  cleanAllMigrations,
+  cleanSingleMigration,
   migrateAll as migrateAllUsers,
   migrateMany as migrateManyUsers,
   migrateSingle as migrateSingleUser,
@@ -47,6 +49,12 @@ app.use('/users/migrate/many/:startId/:endId', (req, res) =>
 );
 
 app.use('/users/migrate/all', (req, res) => requestHandler(migrateAllUsers(), res));
+
+app.use('/users/clean/single/:oldId/:newId', (req, res) =>
+  requestHandler(cleanSingleMigration(parseInt(req.params.oldId), parseInt(req.params.newId)), res)
+);
+
+app.use('/users/clean/all', (req, res) => requestHandler(cleanAllMigrations(), res));
 
 // Catch All
 app.use((req, res) =>
