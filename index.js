@@ -5,7 +5,11 @@ import 'dotenv/config';
 import express from 'express';
 import './config/mongoose.js';
 import './config/mysql.js';
-import { migrateMany as migrateManyUsers, migrateSingle as migrateSingleUser } from './controllers/users.js';
+import {
+  migrateAll as migrateAllUsers,
+  migrateMany as migrateManyUsers,
+  migrateSingle as migrateSingleUser,
+} from './controllers/users.js';
 
 // Load logger
 import Winston from './utils/winston.js';
@@ -41,6 +45,8 @@ app.use('/users/migrate/single/:userId', (req, res) =>
 app.use('/users/migrate/many/:startId/:endId', (req, res) =>
   requestHandler(migrateManyUsers(req.params.startId, req.params.endId), res)
 );
+
+app.use('/users/migrate/all', (req, res) => requestHandler(migrateAllUsers(), res));
 
 // Catch All
 app.use((req, res) =>
