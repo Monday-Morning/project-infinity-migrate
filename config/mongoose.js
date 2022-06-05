@@ -16,7 +16,7 @@ export const connection = mongoose.connection?.readyState !== 1 ? mongoose.conne
 
 export function isValidObjectId(id) {
   if (mongoose.Types.ObjectId.isValid(id)) {
-    if (String(new ObjectId(id)) === id) return true;
+    if (String(new mongoose.Types.ObjectId(id)) === id) return true;
     return false;
   }
   return false;
