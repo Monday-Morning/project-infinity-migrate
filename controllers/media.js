@@ -63,7 +63,15 @@ export function getDefaultAuthor() {
   };
 }
 
-async function convertRecordToDocument(id, imageType, imageBuffer, newFileName, newStore, recordLinkedTo) {
+async function convertRecordToDocument(
+  id,
+  imageType,
+  imageBuffer,
+  newFileName,
+  newStore,
+  recordLinkedTo,
+  recordLinkModel
+) {
   return {
     _id: id,
     authors: [getDefaultAuthor()],
@@ -71,7 +79,7 @@ async function convertRecordToDocument(id, imageType, imageBuffer, newFileName, 
     storePath: `/${imageType}/${newFileName}`,
     mediaType: 0,
     // blurhash: await encodeImageToBlurhash(imageBuffer),
-    linkedTo: recordLinkedTo ? { reference: recordLinkedTo, onModel: 'Article' } : undefined,
+    linkedTo: recordLinkedTo ? { reference: recordLinkedTo, onModel: recordLinkModel ?? 'Article' } : undefined,
   };
 }
 
@@ -215,6 +223,39 @@ export async function migrateArticleImage(imageUrl, articleId, isCover) {
       ],
       false
     );
+    log.info(`Image Uploaded.`);
+
+    return _newMediaDocument;
+  } catch (error) {
+    log.error(`Could not migrate image: `, error);
+    return null;
+  }
+}
+
+export async function migrateIssueCover(imageUrl, issueId) {
+  try {
+    log.info(`Parsing image url...`);
+    const _newFileName = `${issueId}.jpeg`;
+
+    log.info(`Downloading image...`);
+    const _imageBuffer = await downloadImage(imageUrl);
+
+    log.info(`Convering to progressive jpeg...`);
+    const _convertedImageBuffer = await convertToJpeg(_imageBuffer);
+
+    log.info(`Processing document...`);
+    const _newMediaDocument = await convertRecordToDocument(
+      issueId,
+      'issue',
+      _convertedImageBuffer,
+      _newFileName,
+      false,
+      issueId,
+      'Issue'
+    );
+
+    log.info(`Uploading image...`);
+    await uploadImage('issue', _convertedImageBuffer, _newFileName, ['issue', issueId], false);
     log.info(`Image Uploaded.`);
 
     return _newMediaDocument;

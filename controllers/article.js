@@ -12,7 +12,6 @@ import tagModel from '../models/tag.model.js';
 import userModel from '../models/user.model.js';
 import { getDefaultAuthor, migrateArticleImage, deleteManyImages, deleteAllImages } from './media.js';
 import mongoose from 'mongoose';
-import { migrateMany as migrateManyUsers } from './users.js';
 const log = new Logger('Article Migrate');
 
 function getListOfRecords(startId, endId) {
@@ -60,11 +59,13 @@ async function parseAuthors(postId) {
     log.info(`ID #${postId} | Parsing authors...`);
     const _oldAuthors = (await getAuthors(postId)).map((oldAuthor) => oldAuthor.mongo_id);
     log.info(`ID #${postId} | Authors Parsed.`);
-    return (await userModel.find({ _id: _oldAuthors })).map((newAuthor) => ({
-      name: newAuthor.fullName,
-      team: 0,
-      details: newAuthor._id,
-    }));
+    return (await userModel.find({ _id: _oldAuthors }))
+      .map((newAuthor) => ({
+        name: newAuthor.fullName,
+        team: 0,
+        details: newAuthor._id,
+      }))
+      .filter((item) => item.details && item.details !== '');
   } catch (error) {
     log.error(`ID #${postId} | Unable to parse authors: `, error);
     throw error;

@@ -19,6 +19,7 @@ import {
 import { migrate as migrateTags } from './controllers/tag.js';
 import { migrate as migrateAdminTags } from './controllers/adminTag.js';
 import { migrateMany as migrateManyArticles, migrateSingle as migrateSingleArticle } from './controllers/article.js';
+import { migrateSingle as migrateSingleIssue } from './controllers/issue.js';
 
 const app = express();
 
@@ -75,6 +76,13 @@ app.use('/article/migrate/single/:articleId', (req, res) =>
 
 app.use('/article/migrate/many/:startId/:endId', (req, res) =>
   requestHandler(migrateManyArticles(parseInt(req.params.startId), parseInt(req.params.endId)), res)
+);
+
+/**
+ * Issue Migration Endpoints
+ */
+app.use('/issue/migration/single/:issueId', (req, res) =>
+  requestHandler(migrateSingleIssue(parseInt(req.params.issueId)), res)
 );
 
 // Catch All
