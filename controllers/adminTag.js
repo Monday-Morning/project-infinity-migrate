@@ -1,4 +1,4 @@
-import { performQuery } from '../config/mysql';
+import { performQuery } from '../config/mysql.js';
 import { toMarkdown } from '../utils/content.js';
 import { eachOfSeries } from 'async';
 import tagModel from '../models/tag.model.js';
