@@ -12,10 +12,12 @@
     "canvas": "^2.9.1",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "html-table-to-json": "^1.0.0",
     "imagekit": "^3.2.5",
     "mongoose": "^6.3.4",
     "mysql": "^2.18.1",
     "node-fetch": "^3.2.4",
+    "node-html-markdown": "^1.2.0",
     "sharp": "^0.30.6",
     "winston": "^3.7.2"
   }

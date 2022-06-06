@@ -83,7 +83,11 @@ export function cleanManyMigrations(oldIds, newIds) {
 }
 
 export function cleanAllMigrations() {
-  return Promise.all([performQuery(`UPDATE users SET mongo_id="";`), deleteAllImages('/user/', true)]);
+  return Promise.all([
+    performQuery(`UPDATE users SET mongo_id="";`),
+    userModel.deleteMany({}),
+    deleteAllImages('/user/', true),
+  ]);
 }
 
 export async function migrateSingle(oldId) {
@@ -103,15 +107,18 @@ export async function migrateSingle(oldId) {
     }
 
     log.info(`ID #${oldId} | Checking for clashing Email IDs...`);
-    const _checkUser = _oldUser.user_email.includes('@gmail')
-      ? await userModel.findOne({
-          email: _oldUser.user_email,
-        })
-      : null;
+
+    const _userEmail = testGmail(_oldUser.user_email)
+      ? _oldUser.user_email
+      : testGmail(_oldUser.user_login)
+      ? _oldUser.user_login
+      : `transfer-${_oldUser.user_login.toString().trim().replace(/\s|@/g, '')}@gmail.com`.replace(/\W@/g, '@');
+
+    const _checkUser = await userModel.exists({ email: _userEmail });
 
     log.info(`ID #${oldId} | Creating user record...`);
     const _formattedUser = convertRecordToDocument(_oldUser, undefined);
-    const _newUser = !_checkUser?._id
+    const _newUser = !_checkUser
       ? await createDocument(_formattedUser)
       : await updateDocument(_checkUser._id, _formattedUser);
 

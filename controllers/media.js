@@ -3,6 +3,7 @@ import { encode } from 'blurhash';
 import canvas from 'canvas';
 import { adamantiumA, infinityA } from '../config/imagekit.js';
 import sharp from 'sharp';
+import mongoose from 'mongoose';
 
 import Logger from '../utils/winston.js';
 const log = new Logger('Media Migrate');
@@ -55,14 +56,14 @@ function uploadImage(imageType, imageBuffer, newFileName, tags, newStore) {
       });
 }
 
-function getDefaultAuthor() {
+export function getDefaultAuthor() {
   return {
     name: 'Team MM',
     details: '6269a756fd0601b182e327d5',
   };
 }
 
-async function createDocument(id, imageType, imageBuffer, newFileName, newStore) {
+async function convertRecordToDocument(id, imageType, imageBuffer, newFileName, newStore, recordLinkedTo) {
   return {
     _id: id,
     authors: [getDefaultAuthor()],
@@ -70,6 +71,7 @@ async function createDocument(id, imageType, imageBuffer, newFileName, newStore)
     storePath: `/${imageType}/${newFileName}`,
     mediaType: 0,
     blurhash: await encodeImageToBlurhash(imageBuffer),
+    linkedTo: recordLinkedTo ? { reference: recordLinkedTo, onModel: 'Article' } : undefined,
   };
 }
 
@@ -154,10 +156,65 @@ export async function migrateProfilePicture(imageUrl, id) {
     const _convertedImageBuffer = await convertToJpeg(_imageBuffer);
 
     log.info(`Processing document...`);
-    const _newMediaDocument = await createDocument(id, 'user', _convertedImageBuffer, _newFileName, true);
+    const _newMediaDocument = await convertRecordToDocument(id, 'user', _convertedImageBuffer, _newFileName, true);
 
     log.info(`Uploading image...`);
     await uploadImage('user', _convertedImageBuffer, _newFileName, ['user', [], true], true);
+    log.info(`Image Uploaded.`);
+
+    return _newMediaDocument;
+  } catch (error) {
+    log.error(`Could not migrate image: `, error);
+    return null;
+  }
+}
+
+export async function migrateArticleImage(imageUrl, articleId, isCover) {
+  try {
+    const _id = new mongoose.Types.ObjectId();
+    log.info(`Parsing image url...`);
+    const _newFileName = `${_id}.jpeg`;
+
+    log.info(`Downloading image...`);
+    const _imageBuffer = await downloadImage(imageUrl);
+
+    log.info(`Convering to progressive jpeg...`);
+    const _convertedImageBuffer = await convertToJpeg(_imageBuffer);
+
+    log.info(`Processing document...`);
+    const _newMediaDocument = await convertRecordToDocument(
+      _id,
+      isCover ? 'article/cover' : 'article/content',
+      _convertedImageBuffer,
+      _newFileName,
+      false,
+      articleId
+    );
+
+    log.info(`Saving document...`);
+    await mediaModel.create(_newMediaDocument);
+
+    log.info(`Uploading image...`);
+    const _transformation = isCover ? decodeURI(imageUrl.split('/').slice(-1)).split('?')[1] : null;
+    await uploadImage(
+      isCover ? 'article/cover' : 'article/content',
+      _convertedImageBuffer,
+      _newFileName,
+      [
+        'article',
+        isCover ? 'cover' : 'content',
+        articleId,
+        _transformation
+          ? _transformation.includes('square')
+            ? 'square'
+            : _transformation.includes('rectangle')
+            ? 'rectangle'
+            : undefined
+          : undefined,
+        true,
+      ],
+      false
+    );
     log.info(`Image Uploaded.`);
 
     return _newMediaDocument;

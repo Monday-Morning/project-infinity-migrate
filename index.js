@@ -6,12 +6,14 @@ import express from 'express';
 import './config/mongoose.js';
 import './config/mysql.js';
 import {
-  cleanAllMigrations,
-  cleanSingleMigration,
+  cleanAllMigrations as cleanAllUserMigrations,
+  cleanSingleMigration as cleanSingleUserMigration,
   migrateAll as migrateAllUsers,
   migrateMany as migrateManyUsers,
   migrateSingle as migrateSingleUser,
 } from './controllers/users.js';
+import { migrate as migrateTags } from './controllers/tag.js';
+import { migrate as migrateAdminTags } from './controllers/adminTag.js';
 
 // Load logger
 import Winston from './utils/winston.js';
@@ -51,10 +53,17 @@ app.use('/users/migrate/many/:startId/:endId', (req, res) =>
 app.use('/users/migrate/all', (req, res) => requestHandler(migrateAllUsers(), res));
 
 app.use('/users/clean/single/:oldId/:newId', (req, res) =>
-  requestHandler(cleanSingleMigration(parseInt(req.params.oldId), parseInt(req.params.newId)), res)
+  requestHandler(cleanSingleUserMigration(parseInt(req.params.oldId), parseInt(req.params.newId)), res)
 );
 
-app.use('/users/clean/all', (req, res) => requestHandler(cleanAllMigrations(), res));
+app.use('/users/clean/all', (req, res) => requestHandler(cleanAllUserMigrations(), res));
+
+/**
+ * Tag Migration Endpoints
+ */
+app.use('/tag/migrate/all', (req, res) => requestHandler(migrateTags(), res));
+
+app.use('/adminTag/migrate/all', (req, res) => requestHandler(migrateAdminTags(), res));
 
 // Catch All
 app.use((req, res) =>
