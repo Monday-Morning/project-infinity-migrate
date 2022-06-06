@@ -1,5 +1,5 @@
-import { performQuery } from '../config/mysql';
-import { deleteSingleImage, migrateIssueCover } from './media';
+import { performQuery } from '../config/mysql.js';
+import { deleteSingleImage, migrateIssueCover } from './media.js';
 import issueModel from '../models/issue.model.js';
 import mongoose from 'mongoose';
 
