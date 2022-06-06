@@ -3,6 +3,9 @@ import { deleteSingleImage, migrateIssueCover } from './media.js';
 import issueModel from '../models/issue.model.js';
 import mongoose from 'mongoose';
 
+import Logger from '../utils/winston.js';
+const log = new Logger('Issue Migrate');
+
 function getListOfRecords(startId, endId) {
   return performQuery(
     `SELECT issue_id FROM issues WHERE issue_id <= ${startId ?? 0} AND issue_id >= ${
