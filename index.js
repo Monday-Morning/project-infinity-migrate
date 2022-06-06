@@ -1,6 +1,10 @@
 /// Load environment configs
 import 'dotenv/config';
 
+// Load logger
+import Winston from './utils/winston.js';
+const log = new Winston('Main');
+
 // Import all modules
 import express from 'express';
 import './config/mongoose.js';
@@ -14,10 +18,7 @@ import {
 } from './controllers/users.js';
 import { migrate as migrateTags } from './controllers/tag.js';
 import { migrate as migrateAdminTags } from './controllers/adminTag.js';
-
-// Load logger
-import Winston from './utils/winston.js';
-const log = new Winston('Main');
+import { migrateSingle as migrateSingleArticle } from './controllers/article.js';
 
 const app = express();
 
@@ -64,6 +65,13 @@ app.use('/users/clean/all', (req, res) => requestHandler(cleanAllUserMigrations(
 app.use('/tag/migrate/all', (req, res) => requestHandler(migrateTags(), res));
 
 app.use('/adminTag/migrate/all', (req, res) => requestHandler(migrateAdminTags(), res));
+
+/**
+ * Article Migration Endpoints
+ */
+app.use('/article/migrate/single/:articleId', (req, res) =>
+  requestHandler(migrateSingleArticle(parseInt(req.params.articleId)), res)
+);
 
 // Catch All
 app.use((req, res) =>

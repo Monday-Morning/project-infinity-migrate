@@ -3,6 +3,9 @@ import { NodeHtmlMarkdown } from 'node-html-markdown';
 import HtmlTableToJson from 'html-table-to-json';
 import { migrateArticleImage } from '../controllers/media.js';
 
+import Logger from './winston.js';
+const log = new Logger('Article Content Migrate');
+
 const nhm = new NodeHtmlMarkdown();
 export function toMarkdown(html) {
   return nhm.translate(html);
@@ -36,12 +39,12 @@ function getReadTime(text) {
 
 export async function parseContent(content, articleId) {
   try {
-    logger.info(`Parsing content: Total ${content.length} items...`);
+    log.info(`ID #${articleId} | Parsing content: Total ${content.length} items...`);
     const _res = [];
     const _mediaIds = [];
     let _readTime = 0;
     await eachOfSeries(content, async (contentItem, index) => {
-      logger.info(`Parsing item #${index + 1} of ${content.length}...`);
+      log.info(`ID #${articleId} | Parsing item #${index + 1} of ${content.length}...`);
       switch (contentItem.type) {
         // Quote
         case 0:
@@ -72,7 +75,7 @@ export async function parseContent(content, articleId) {
               media: _image._id,
             });
           } catch (error) {
-            logger.error('Could not parse content item: ', error);
+            log.error(`ID #${articleId} | Could not parse content item: `, error);
           }
           break;
 
@@ -154,13 +157,13 @@ export async function parseContent(content, articleId) {
           break;
 
         default:
-          logger.error(`Content item could not be parsed: ${JSON.stringify(contentItem)}`);
+          log.error(`ID #${articleId} | Content item could not be parsed: ${JSON.stringify(contentItem)}`);
           break;
       }
     });
-    logger.info(`Content Parsed.`);
+    log.info(`ID #${articleId} | Content Parsed.`);
     return [_res.filter((x) => x.text && x.text !== ''), _mediaIds, Math.floor(_readTime) || 300];
   } catch (error) {
-    logger.error('Could not parse content: ', error);
+    log.error(`ID #${articleId} | Could not parse content: `, error);
   }
 }
