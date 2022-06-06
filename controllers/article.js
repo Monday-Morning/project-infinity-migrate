@@ -8,16 +8,18 @@ import { parseContent } from '../utils/content.js';
 
 import Logger from '../utils/winston.js';
 import articleModel from '../models/article.model.js';
+import tagModel from '../models/tag.model.js';
 import userModel from '../models/user.model.js';
 import { getDefaultAuthor, migrateArticleImage, deleteManyImages, deleteAllImages } from './media.js';
 import mongoose from 'mongoose';
+import { migrateMany as migrateManyUsers } from './users.js';
 const log = new Logger('Article Migrate');
 
 function getListOfRecords(startId, endId) {
   return performQuery(
     `SELECT post_id, mongo_id, media_ids FROM posts WHERE post_type = 1 AND post_publish_status = 0 AND post_id >= ${
       startId ?? 0
-    } AND post_id <= ${endId ?? 1000000} ORDER BY post_id ASC;`
+    } AND post_id <= ${endId ?? 1000000} ORDER BY post_id DESC;`
   );
 }
 
@@ -58,7 +60,7 @@ async function parseAuthors(postId) {
     log.info(`ID #${postId} | Parsing authors...`);
     const _oldAuthors = (await getAuthors(postId)).map((oldAuthor) => oldAuthor.mongo_id);
     log.info(`ID #${postId} | Authors Parsed.`);
-    return (await UserModel.find({ _id: _oldAuthors })).map((newAuthor) => ({
+    return (await userModel.find({ _id: _oldAuthors })).map((newAuthor) => ({
       name: newAuthor.fullName,
       team: 0,
       details: newAuthor._id,
@@ -115,7 +117,7 @@ async function parseTags(postId) {
     const _oldPostTags = (await getPostTags(postId)).map((oldTag) => oldTag.mongo_id);
     const _oldAdminLabels = (await getAdminLabels(postId)).map((oldLabel) => oldLabel.mongo_id);
     log.info(`ID #${postId} | Tags Parsed`);
-    return (await TagModel.find({ _id: [..._oldPostTags, ..._oldAdminLabels] })).map((_newTag) => ({
+    return (await tagModel.find({ _id: [..._oldPostTags, ..._oldAdminLabels] })).map((_newTag) => ({
       name: _newTag.name,
       isAdmin: _newTag.isAdmin,
       reference: _newTag._id,
@@ -316,7 +318,7 @@ export async function migrateSingle(oldId) {
     );
 
     log.info(`ID #${oldId} | Storing processed article...`);
-    const _newArticle = await createDocument(_formattedArticle);
+    const _newArticle = await articleModel.create(_formattedArticle);
 
     log.info(`ID #${oldId} | Updating article mapping...`);
     await updateMapping(oldId, _newArticle._id, [
@@ -335,6 +337,28 @@ export async function migrateSingle(oldId) {
     return _newArticle;
   } catch (error) {
     log.error(`ID #${oldId} | Could not migrate article: `, error);
+    return null;
+  }
+}
+
+export async function migrateMany(startId, endId) {
+  try {
+    log.info(`Retrieving ids in range...`);
+    const _oldRecords = await getListOfRecords(startId, endId);
+    log.info(`Retrieved ${_oldRecords.length} users.`);
+
+    const _newRecords = [];
+    await eachOfSeries(_oldRecords, async (oldRecord, index) => {
+      log.info(`ID #${oldRecord.post_id} | Processing #${index + 1} of ${_oldRecords.length} articles.`);
+      const _newRecord = await migrateSingle(oldRecord.post_id);
+      _newRecords.push(_newRecord);
+      return _newRecord;
+    });
+
+    log.info(`All articles migrated!`);
+    return _newRecords;
+  } catch (error) {
+    log.error(`Could not migrate articles: `, error);
     return null;
   }
 }

@@ -70,7 +70,7 @@ async function convertRecordToDocument(id, imageType, imageBuffer, newFileName, 
     store: newStore ? 2 : 0,
     storePath: `/${imageType}/${newFileName}`,
     mediaType: 0,
-    blurhash: await encodeImageToBlurhash(imageBuffer),
+    // blurhash: await encodeImageToBlurhash(imageBuffer),
     linkedTo: recordLinkedTo ? { reference: recordLinkedTo, onModel: 'Article' } : undefined,
   };
 }
