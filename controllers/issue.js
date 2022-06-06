@@ -2,6 +2,7 @@ import { performQuery } from '../config/mysql.js';
 import { deleteSingleImage, migrateIssueCover } from './media.js';
 import issueModel from '../models/issue.model.js';
 import mongoose from 'mongoose';
+import { isValidObjectId } from '../config/mongoose.js';
 
 import Logger from '../utils/winston.js';
 const log = new Logger('Issue Migrate');
