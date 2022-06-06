@@ -3,6 +3,7 @@ import { deleteSingleImage, migrateIssueCover } from './media.js';
 import issueModel from '../models/issue.model.js';
 import mongoose from 'mongoose';
 import { isValidObjectId } from '../config/mongoose.js';
+import moment from 'moment';
 
 import Logger from '../utils/winston.js';
 const log = new Logger('Issue Migrate');
@@ -33,10 +34,6 @@ function getIssueArticles(startDate, endDate, postIds) {
 
 function uploadCoverPicture(fileName, issueId) {
   return fileName ? migrateIssueCover(`https://ik.imagekit.io/adamantiumA/uploads/issue/${fileName}`, issueId) : null;
-}
-
-function createDocument(newIssue) {
-  return issueModel.create(newIssue);
 }
 
 function updateMapping(oldId, newId) {
