@@ -18,7 +18,11 @@ import {
 } from './controllers/users.js';
 import { migrate as migrateTags } from './controllers/tag.js';
 import { migrate as migrateAdminTags } from './controllers/adminTag.js';
-import { migrateMany as migrateManyArticles, migrateSingle as migrateSingleArticle } from './controllers/article.js';
+import {
+  cleanSingleMigration as cleanSingleArticleMigration,
+  migrateMany as migrateManyArticles,
+  migrateSingle as migrateSingleArticle,
+} from './controllers/article.js';
 import { migrateSingle as migrateSingleIssue } from './controllers/issue.js';
 
 const app = express();
@@ -52,20 +56,20 @@ app.use('/users/migrate/many/:startId/:endId', (req, res) =>
   requestHandler(migrateManyUsers(req.params.startId, req.params.endId), res)
 );
 
-app.use('/users/migrate/all', (req, res) => requestHandler(migrateAllUsers(), res));
+app.use('/users/migrate/all', (_req, res) => requestHandler(migrateAllUsers(), res));
 
 app.use('/users/clean/single/:oldId/:newId', (req, res) =>
   requestHandler(cleanSingleUserMigration(parseInt(req.params.oldId), parseInt(req.params.newId)), res)
 );
 
-app.use('/users/clean/all', (req, res) => requestHandler(cleanAllUserMigrations(), res));
+app.use('/users/clean/all', (_req, res) => requestHandler(cleanAllUserMigrations(), res));
 
 /**
  * Tag Migration Endpoints
  */
-app.use('/tag/migrate/all', (req, res) => requestHandler(migrateTags(), res));
+app.use('/tag/migrate/all', (_req, res) => requestHandler(migrateTags(), res));
 
-app.use('/adminTag/migrate/all', (req, res) => requestHandler(migrateAdminTags(), res));
+app.use('/adminTag/migrate/all', (_req, res) => requestHandler(migrateAdminTags(), res));
 
 /**
  * Article Migration Endpoints
@@ -78,10 +82,14 @@ app.use('/article/migrate/many/:startId/:endId', (req, res) =>
   requestHandler(migrateManyArticles(parseInt(req.params.startId), parseInt(req.params.endId)), res)
 );
 
+app.use('/article/clean/single/:oldId/:newId', (req, res) =>
+  requestHandler(cleanSingleArticleMigration(parseInt(req.params.oldId), req.params.newId), res)
+);
+
 /**
  * Issue Migration Endpoints
  */
-app.use('/issue/migration/single/:issueId', (req, res) =>
+app.use('/issue/migrate/single/:issueId', (req, res) =>
   requestHandler(migrateSingleIssue(parseInt(req.params.issueId)), res)
 );
 
@@ -94,9 +102,9 @@ app.use((req, res) =>
   })
 );
 
-const server = app.listen(process.env.PORT || 8080, (error) => {
+const server = app.listen(process.env.PORT ?? 8080, (error) => {
   if (error) return log.error(`Could not start server: `, error);
-  return log.info(`Server started listening on 0.0.0.0:${process.env.PORT || 8080}`);
+  return log.info(`Server started listening on 0.0.0.0:${process.env.PORT ?? 8080}`);
 });
 
 export default server;
