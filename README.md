@@ -36,7 +36,7 @@
 	</p>
 	
   <p align="center">
-			<a href="[https://github.com/Monday-Morning/project-infinity-migrate/blob/main/LICENSE](https://app.getpostman.com/run-collection/12460663-3f55b1ed-143c-4408-84d8-2af2b529952c?action=collection%2Ffork&collection-url=entityId%3D12460663-3f55b1ed-143c-4408-84d8-2af2b529952c%26entityType%3Dcollection%26workspaceId%3Dc4baa274-1d2d-42ae-885e-05446764e081)">
+			<a href="https://app.getpostman.com/run-collection/12460663-3f55b1ed-143c-4408-84d8-2af2b529952c?action=collection%2Ffork&collection-url=entityId%3D12460663-3f55b1ed-143c-4408-84d8-2af2b529952c%26entityType%3Dcollection%26workspaceId%3Dc4baa274-1d2d-42ae-885e-05446764e081">
     		<img src="https://run.pstmn.io/button.svg" alt="Run in Postman">
     	</a>
 	</p>
