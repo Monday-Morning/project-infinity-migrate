@@ -236,8 +236,8 @@ function removeUserMapping(userIds, articleId) {
 export async function cleanSingleMigration(oldId, newId) {
   try {
     const [[_oldRecord], _newRecord] = await Promise.all([getRecord(oldId), articleModel.findById(newId)]);
-    const _imageRecords = _oldRecord.media_ids.split(',').filter((item) => item);
-    const _imageFileNames = _imageRecords.map((item) => `${item}.jpeg`);
+    const _imageRecords = await _oldRecord.media_ids.split(',').filter((item) => item);
+    const _imageFileNames = await _imageRecords.map((item) => `${item}.jpeg`);
     return Promise.all([
       // updateMapping(oldId, '', null),
       deleteManyImages(_imageFileNames, false, _imageRecords),
