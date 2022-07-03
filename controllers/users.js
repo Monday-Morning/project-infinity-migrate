@@ -62,17 +62,17 @@ function updateDocument(id, newUser) {
 
 export function cleanSingleMigration(oldId, newId) {
   return Promise.all([
-    oldId ? updateMapping(oldId, '') : Promise.resolve(),
-    newId ? userModel.deleteOne({ _id: newId }) : Promise.resolve(),
+    // oldId ? updateMapping(oldId, '') : Promise.resolve(),
+    // newId ? userModel.deleteOne({ _id: newId }) : Promise.resolve(),
     newId ? deleteSingleImage(`${newId}.jpeg`, true) : Promise.resolve(),
   ]);
 }
 
 export function cleanManyMigrations(oldIds, newIds) {
   return Promise.all([
-    oldIds.length > 0
-      ? performQuery(`UPDATE users SET mongo_id="" WHERE user_id IN (${oldIds.join(',')});`)
-      : Promise.resolve(),
+    // oldIds.length > 0
+    //   ? performQuery(`UPDATE users SET mongo_id="" WHERE user_id IN (${oldIds.join(',')});`)
+    //   : Promise.resolve(),
     newIds.length > 0
       ? deleteManyImages(
           newIds.map((item) => `${item}.jpeg`),
@@ -84,8 +84,8 @@ export function cleanManyMigrations(oldIds, newIds) {
 
 export function cleanAllMigrations() {
   return Promise.all([
-    performQuery(`UPDATE users SET mongo_id="";`),
-    userModel.deleteMany({}),
+    // performQuery(`UPDATE users SET mongo_id="";`),
+    // userModel.deleteMany({}),
     deleteAllImages('/user/', true),
   ]);
 }

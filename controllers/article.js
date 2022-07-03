@@ -236,21 +236,16 @@ function removeUserMapping(userIds, articleId) {
 export async function cleanSingleMigration(oldId, newId) {
   try {
     const [[_oldRecord], _newRecord] = await Promise.all([getRecord(oldId), articleModel.findById(newId)]);
+    const _imageRecords = _oldRecord.media_ids.split(',').filter((item) => item);
+    const _imageFileNames = _imageRecords.map((item) => `${item}.jpeg`);
     return Promise.all([
-      updateMapping(oldId, '', null),
-      deleteManyImages(
-        _oldRecord.media_ids
-          .split(',')
-          .filter((item) => item)
-          .map((item) => `${item}.jpeg`),
-        false,
-        _oldRecord.media_ids.split(',').filter((item) => item)
-      ),
-      removeUserMapping(
-        _newRecord.users.map((item) => item.details),
-        newId
-      ),
-      articleModel.findByIdAndDelete(newId),
+      // updateMapping(oldId, '', null),
+      deleteManyImages(_imageFileNames, false, _imageRecords),
+      // removeUserMapping(
+      //   _newRecord.users.map((item) => item.details),
+      //   newId
+      // ),
+      // articleModel.findByIdAndDelete(newId),
     ]);
   } catch (error) {
     log.error(`Could not clean migration: `, error);
@@ -260,10 +255,10 @@ export async function cleanSingleMigration(oldId, newId) {
 export async function cleanAllMigrations() {
   try {
     return Promise.all([
-      performQuery(`UPDATE posts SET mongo_id="", media_ids="";`),
+      // performQuery(`UPDATE posts SET mongo_id="", media_ids="";`),
       deleteAllImages('/article/'),
-      userModel.updateMany({}, { contributions: [] }),
-      articleModel.deleteMany({}),
+      // userModel.updateMany({}, { contributions: [] }),
+      // articleModel.deleteMany({}),
     ]);
   } catch (error) {
     log.error(`Could not clean migrations: `, error);
