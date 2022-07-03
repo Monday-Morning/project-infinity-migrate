@@ -101,7 +101,11 @@ export async function deleteSingleImage(imageFileName, newStore, recordId) {
         });
     return Promise.all([
       recordId ? mediaModel.deleteOne({ _id: recordId }) : Promise.resolve(),
-      newStore ? infinityA.deleteFile(_file.fileId) : adamantiumA.deleteFile(_file.fileId),
+      _file
+        ? newStore
+          ? infinityA.deleteFile(_file.fileId)
+          : adamantiumA.deleteFile(_file.fileId)
+        : Promise.resolve(),
     ]);
   } catch (error) {
     log.error(`Could not delete profile picture: `, error);
@@ -114,17 +118,21 @@ export async function deleteManyImages(imageFileNames, newStore, recordIds) {
     const _files = newStore
       ? await (
           await infinityA.listFiles({
-            searchQuery: `name IN [${imageFileNames.toString()}]`,
+            searchQuery: `name IN ["${imageFileNames.join('","')}"]`,
           })
         ).map((item) => item.fileId)
       : await (
           await adamantiumA.listFiles({
-            searchQuery: `name IN [${imageFileNames.toString()}]`,
+            searchQuery: `name IN ["${imageFileNames.join('","')}"]`,
           })
         ).map((item) => item.fileId);
     return Promise.all([
       recordIds ? mediaModel.deleteMany({ _id: recordIds }) : Promise.resolve(),
-      newStore ? infinityA.bulkDeleteFiles(_files) : adamantiumA.bulkDeleteFiles(_files),
+      _files.length > 0
+        ? newStore
+          ? infinityA.bulkDeleteFiles(_files)
+          : adamantiumA.bulkDeleteFiles(_files)
+        : Promise.resolve(),
     ]);
   } catch (error) {
     log.error(`Could not delete profile pictures: `, error);

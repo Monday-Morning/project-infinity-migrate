@@ -281,7 +281,10 @@ export async function migrateSingle(oldId) {
       log.info(`ID #${oldId} | No past migration found!`);
     }
 
-    const _id = new mongoose.Types.ObjectId();
+    log.info(`ID #${oldId} | Checking for clashing Article IDs...`);
+    const _checkArticle = await articleModel.exists({ oldArticleId: oldId });
+
+    const _id = !_checkArticle ? new mongoose.Types.ObjectId() : new mongoose.Types.ObjectId(_checkArticle._id);
 
     const [_apiResponse, [_createdBy], [_updatedBy]] = await Promise.all([
       getAPIResponse(oldId),
@@ -299,9 +302,6 @@ export async function migrateSingle(oldId) {
     const _parsedCoverMedia = await parseCoverMedia(_apiResponse.post.featured_image, oldId, _id);
 
     const [_parsedContent, _parsedMedia, _readTime] = await parseContent(_apiResponse.post.post_content, _id);
-
-    log.info(`ID #${oldId} | Checking for clashing Article IDs...`);
-    const _checkArticle = await articleModel.exists({ oldArticleId: oldId });
 
     log.info(`ID #${oldId} | Creating article record...`);
     const _formattedArticle = convertRecordToDocument(
