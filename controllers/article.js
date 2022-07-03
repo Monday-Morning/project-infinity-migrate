@@ -300,6 +300,10 @@ export async function migrateSingle(oldId) {
 
     const [_parsedContent, _parsedMedia, _readTime] = await parseContent(_apiResponse.post.post_content, _id);
 
+    log.info(`ID #${oldId} | Checking for clashing Article IDs...`);
+    const _checkArticle = await articleModel.exists({ oldArticleId: oldId });
+
+    log.info(`ID #${oldId} | Creating article record...`);
     const _formattedArticle = convertRecordToDocument(
       _id,
       _oldArticle,
@@ -314,7 +318,9 @@ export async function migrateSingle(oldId) {
     );
 
     log.info(`ID #${oldId} | Storing processed article...`);
-    const _newArticle = await articleModel.create(_formattedArticle);
+    const _newArticle = !_checkArticle
+      ? await articleModel.create(_formattedArticle)
+      : await articleModel.findByIdAndUpdate(_checkArticle._id, _formattedArticle);
 
     log.info(`ID #${oldId} | Updating article mapping...`);
     await updateMapping(oldId, _newArticle._id, [
@@ -323,11 +329,13 @@ export async function migrateSingle(oldId) {
       ..._parsedMedia,
     ]);
 
-    log.info(`ID #${oldId} | Updating user mapping...`);
-    await insertUserMapping(
-      _parsedAuthors.map((item) => item.details),
-      _id
-    );
+    if (!_checkArticle) {
+      log.info(`ID #${oldId} | Updating user mapping...`);
+      await insertUserMapping(
+        _parsedAuthors.map((item) => item.details),
+        _id
+      );
+    }
 
     log.info(`ID #${oldId} | Article Stored.`);
     return _newArticle;

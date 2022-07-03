@@ -118,6 +118,8 @@ export async function migrateSingle(oldId) {
 
     log.info(`ID #${oldId} | Creating user record...`);
     const _formattedUser = convertRecordToDocument(_oldUser, undefined);
+
+    log.info(`ID #${oldId} | Storing processed user...`);
     const _newUser = !_checkUser
       ? await createDocument(_formattedUser)
       : await updateDocument(_checkUser._id, _formattedUser);
