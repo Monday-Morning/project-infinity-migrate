@@ -24,6 +24,7 @@ import {
   migrateSingle as migrateSingleArticle,
 } from './controllers/article.js';
 import { migrateSingle as migrateSingleIssue } from './controllers/issue.js';
+import { checkServer, reloadServer } from './controllers/server.js';
 
 const app = express();
 
@@ -92,6 +93,13 @@ app.use('/article/clean/single/:oldId/:newId', (req, res) =>
 app.use('/issue/migrate/single/:issueId', (req, res) =>
   requestHandler(migrateSingleIssue(parseInt(req.params.issueId)), res)
 );
+
+/**
+ * Server Endpoints
+ */
+app.use('/server/restart', (req, res) => requestHandler(reloadServer(), res));
+
+app.use('/server/check', (req, res) => requestHandler(checkServer(), res));
 
 // Catch All
 app.use((req, res) =>
