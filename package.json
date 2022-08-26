@@ -16,7 +16,7 @@
     "https": "^1.0.0",
     "imagekit": "^3.2.5",
     "moment": "^2.29.3",
-    "mongoose": "^6.3.4",
+    "mongoose": "^6.4.6",
     "mysql": "^2.18.1",
     "node-fetch": "^3.2.4",
     "node-html-markdown": "^1.2.0",
