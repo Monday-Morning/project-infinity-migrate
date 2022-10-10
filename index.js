@@ -23,6 +23,11 @@ import {
   migrateMany as migrateManyArticles,
   migrateSingle as migrateSingleArticle,
 } from './controllers/article.js';
+import {
+  migrateSingle as migrateSinglePhotostory,
+  migrateMany as migrateManyPhotostories,
+  cleanSingleMigration as cleanSinglePhotostoryMigration,
+} from './controllers/photostory.js';
 import { migrateSingle as migrateSingleIssue } from './controllers/issue.js';
 import { checkServer, reloadServer } from './controllers/server.js';
 
@@ -85,6 +90,21 @@ app.use('/article/migrate/many/:startId/:endId', (req, res) =>
 
 app.use('/article/clean/single/:oldId/:newId', (req, res) =>
   requestHandler(cleanSingleArticleMigration(parseInt(req.params.oldId), req.params.newId), res)
+);
+
+/**
+ * Photostory Migration Endpoints
+ */
+app.use('/photostory/migrate/single/:storyId', (req, res) =>
+  requestHandler(migrateSinglePhotostory(parseInt(req.params.storyId)), res)
+);
+
+app.use('/photostory/migrate/many/:startId/:endId', (req, res) =>
+  requestHandler(migrateManyPhotostories(parseInt(req.params.startId), parseInt(req.params.endId)), res)
+);
+
+app.use('/photostory/clean/single/:oldId/:newId', (req, res) =>
+  requestHandler(cleanSinglePhotostoryMigration(parseInt(req.params.oldId), req.params.newId), res)
 );
 
 /**
