@@ -227,7 +227,7 @@ export async function updateSingleUserContribution(oldId) {
 
     log.info(`#${oldId} | Found ${_articles.length} articles. Mapping...`);
     const contributions = _articles.map((article) => ({
-      model: '#${oldId} | Article',
+      model: 'Article',
       reference: article._id,
     }));
     const _updatedUser = userModel.findByIdAndUpdate(_user._id, { contributions }, { new: true });
