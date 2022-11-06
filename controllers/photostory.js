@@ -339,7 +339,7 @@ export async function migrateSingle(oldId) {
     const _parsedTags = await parseTags(oldId);
     const _parsedCoverMedia = await parseCoverMedia(_apiResponse.post.featured_image, oldId, _id);
 
-    const [_parsedContent, _parsedMedia, _readTime] = await parseStoryContent(_apiResponse.post.post_content, _id);
+    const [_parsedContent, _parsedMedia, _readTime] = await parseStoryContent(_apiResponse.post.post_id, _id);
 
     log.info(`ID #${oldId} | Creating article record...`);
     const _formattedArticle = convertRecordToDocument(
