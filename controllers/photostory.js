@@ -9,7 +9,7 @@ import Logger from '../utils/winston.js';
 import articleModel from '../models/article.model.js';
 import tagModel from '../models/tag.model.js';
 import userModel from '../models/user.model.js';
-import { getDefaultAuthor, migrateArticleImage, deleteManyImages, deleteAllImages } from './media.js';
+import { getDefaultAuthor, deleteManyImages, deleteAllImages, migratePhotojournalismImage } from './media.js';
 import mongoose from 'mongoose';
 const log = new Logger('Article Migrate');
 
@@ -135,12 +135,12 @@ async function parseTags(postId) {
 async function parseCoverMedia(fileName, postId, articleId) {
   try {
     log.info(`ID #${postId} | Parsing cover media...`);
-    const _square = await migrateArticleImage(
+    const _square = await migratePhotojournalismImage(
       `https://ik.imagekit.io/adamantiumA/uploads/post/${fileName}?tr=n-square`,
       articleId,
       true
     );
-    const _rectangle = await migrateArticleImage(
+    const _rectangle = await migratePhotojournalismImage(
       `https://ik.imagekit.io/adamantiumA/uploads/post/${fileName}?tr=n-rectangle`,
       articleId,
       true
@@ -166,7 +166,7 @@ async function parseStoryContent(postId, articleId) {
     await eachOfSeries(_storyContent, async (storyItem, index) => {
       log.info(`ID #${postId} | Parsing story content item #${index}...`);
 
-      const _image = await migrateArticleImage(
+      const _image = await migratePhotojournalismImage(
         `https://mm.server1.dashnet.in/uploads/photojournalism/${storyItem.image}`,
         articleId,
         false

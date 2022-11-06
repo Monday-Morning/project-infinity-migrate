@@ -240,6 +240,61 @@ export async function migrateArticleImage(imageUrl, articleId, isCover) {
   }
 }
 
+export async function migratePhotojournalismImage(imageUrl, articleId, isCover) {
+  try {
+    const _id = new mongoose.Types.ObjectId();
+    log.info(`Parsing image url...`);
+    const _newFileName = `${_id}.jpeg`;
+
+    log.info(`Downloading image...`);
+    const _imageBuffer = await downloadImage(imageUrl);
+
+    log.info(`Convering to progressive jpeg...`);
+    const _convertedImageBuffer = await convertToJpeg(_imageBuffer);
+
+    log.info(`Processing document...`);
+    const _newMediaDocument = await convertRecordToDocument(
+      _id,
+      isCover ? 'article/cover' : 'article/photojournalism',
+      _convertedImageBuffer,
+      _newFileName,
+      false,
+      articleId
+    );
+
+    log.info(`Saving document...`);
+    await mediaModel.create(_newMediaDocument);
+
+    log.info(`Uploading image...`);
+    const _transformation = isCover ? decodeURI(imageUrl.split('/').slice(-1)).split('?')[1] : null;
+    await uploadImage(
+      isCover ? 'article/cover' : 'article/photojournalism',
+      _convertedImageBuffer,
+      _newFileName,
+      [
+        'article',
+        isCover ? 'cover' : 'photojournalism',
+        articleId,
+        _transformation
+          ? _transformation.includes('square')
+            ? 'square'
+            : _transformation.includes('rectangle')
+            ? 'rectangle'
+            : undefined
+          : undefined,
+        true,
+      ],
+      false
+    );
+    log.info(`Image Uploaded.`);
+
+    return _newMediaDocument;
+  } catch (error) {
+    log.error(`Could not migrate image: `, error);
+    return null;
+  }
+}
+
 export async function migrateIssueCover(imageUrl, issueId) {
   try {
     log.info(`Parsing image url...`);
