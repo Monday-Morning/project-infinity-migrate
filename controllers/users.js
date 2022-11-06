@@ -207,3 +207,34 @@ export async function migrateAll() {
     return null;
   }
 }
+
+export async function updateSingleUserContribution(oldId) {
+  try {
+    log.info(`#${oldId} | Checking if user exists...`);
+    const _user = await userModel.findOne({ oldUserId: oldId });
+    if (!_user) {
+      log.info(`#${oldId} | No such user found!`);
+      return null;
+    }
+    log.info(`#${oldId} | User found. | #${_user._id.toString()} | Checking contributions...`);
+    const _articles = await articleModel.find({ 'users.details': _user._id });
+
+    if (!_articles || _articles.length < 1) {
+      log.info(`#${oldId} | No contributions found!`);
+      return null;
+    }
+
+    log.info(`#${oldId} | Found ${_articles.length} articles. Mapping...`);
+    const contributions = _articles.map((article) => ({
+      model: '#${oldId} | Article',
+      reference: article._id,
+    }));
+    const _updatedUser = userModel.findByIdAndUpdate(_user._id, { contributions }, { new: true });
+
+    log.info(`#${oldId} | User contributions updatd!`);
+    return _updatedUser;
+  } catch (error) {
+    log.error(`Could not update contributions: `, error);
+    return null;
+  }
+}

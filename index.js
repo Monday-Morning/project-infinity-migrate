@@ -15,6 +15,7 @@ import {
   migrateAll as migrateAllUsers,
   migrateMany as migrateManyUsers,
   migrateSingle as migrateSingleUser,
+  updateSingleUserContribution,
 } from './controllers/users.js';
 import { migrate as migrateTags } from './controllers/tag.js';
 import { migrate as migrateAdminTags } from './controllers/adminTag.js';
@@ -63,6 +64,10 @@ app.use('/users/migrate/many/:startId/:endId', (req, res) =>
 );
 
 app.use('/users/migrate/all', (_req, res) => requestHandler(migrateAllUsers(), res));
+
+app.use('/users/migrate/contributions/:userId', (req, res) =>
+  requestHandler(updateSingleUserContribution(req.params.userId), res)
+);
 
 app.use('/users/clean/single/:oldId/:newId', (req, res) =>
   requestHandler(cleanSingleUserMigration(parseInt(req.params.oldId), parseInt(req.params.newId)), res)
