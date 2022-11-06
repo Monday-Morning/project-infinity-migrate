@@ -167,7 +167,7 @@ async function parseStoryContent(postId, articleId) {
       log.info(`ID #${postId} | Parsing story content item #${index}...`);
 
       const _image = await migratePhotojournalismImage(
-        `https://mm.server1.dashnet.in/uploads/photojournalism/${storyItem.image}`,
+        `https://mm.server1.dashnet.in/uploads/photojournalism/${storyItem.name}`,
         articleId,
         false
       );
