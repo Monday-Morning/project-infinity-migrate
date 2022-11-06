@@ -11,6 +11,7 @@ import tagModel from '../models/tag.model.js';
 import userModel from '../models/user.model.js';
 import { getDefaultAuthor, deleteManyImages, deleteAllImages, migratePhotojournalismImage } from './media.js';
 import mongoose from 'mongoose';
+import { toMarkdown } from '../utils/content.js';
 const log = new Logger('Article Migrate');
 
 function getListOfRecords(startId, endId) {
