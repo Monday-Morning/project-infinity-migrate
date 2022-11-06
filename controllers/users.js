@@ -7,6 +7,7 @@ import Logger from '../utils/winston.js';
 const log = new Logger('User Migrate');
 
 import userModel from '../models/user.model.js';
+import articleModel from '../models/article.model.js';
 import { deleteAllImages, deleteManyImages, deleteSingleImage, fixExtension, migrateProfilePicture } from './media.js';
 
 function getListOfRecords(startId, endId) {
