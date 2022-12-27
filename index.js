@@ -35,6 +35,11 @@ import {
   migrateMany as migrateManyCompanies,
   migrateAll as migrateAllCompanies,
 } from './controllers/companies.js';
+import {
+  migrateSingle as migrateSingleLive,
+  migrateMany as migrateManyLive,
+  migrateAll as migrateAllLive,
+} from './controllers/live.js';
 import { checkServer, reloadServer } from './controllers/server.js';
 
 const app = express();
@@ -133,6 +138,15 @@ app.use('/company/migrate/single/:companyId', (req, res) =>
 );
 app.use('/company/migrate/many/:startId/:endId', (req, res) =>
   requestHandler(migrateManyCompanies(req.params.startId, req.params.endId), res)
+);
+
+/**
+ * Live Migration Endpoints
+ */
+app.use('/live/migrate/all', (_req, res) => requestHandler(migrateAllLive(), res));
+app.use('/live/migrate/single/:liveId', (req, res) => requestHandler(migrateSingleLive(req.params.liveId), res));
+app.use('/live/migrate/many/:startId/:endId', (req, res) =>
+  requestHandler(migrateManyLive(req.params.startId, req.params.endId), res)
 );
 
 /**
