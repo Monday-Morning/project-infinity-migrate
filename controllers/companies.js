@@ -3,7 +3,7 @@ import { eachOfSeries } from 'async';
 import companyModel from '../models/company.model.js';
 
 import { performQuery } from '../config/mysql.js';
-import { deleteAllImages, deleteManyImages, deleteSingleImage, migrateCompanyLogo } from './media.js';
+import { deleteAllImages, deleteManyImages, deleteSingleImage, fixExtension, migrateCompanyLogo } from './media.js';
 import { isValidObjectId } from '../config/mongoose.js';
 
 import Logger from '../utils/winston.js';
