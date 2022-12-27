@@ -112,51 +112,51 @@ function updateDocument(id, newCompany) {
   return liveModel.findByIdAndUpdate(id, newCompany, { new: true });
 }
 
-export async function cleanSingleMigration(oldId, newId) {
-  return Promise.all([
-    // oldId ? updateMapping(oldId, '') : Promise.resolve(),
-    // newId ? liveModel.deleteOne({ _id: newId }) : Promise.resolve(),
-    newId ? deleteSingleImage(`${newId}.jpeg`, true) : Promise.resolve(),
-  ]);
-}
+// export async function cleanSingleMigration(oldId, newId) {
+//   return Promise.all([
+//     // oldId ? updateMapping(oldId, '') : Promise.resolve(),
+//     // newId ? liveModel.deleteOne({ _id: newId }) : Promise.resolve(),
+//     newId ? deleteSingleImage(`${newId}.jpeg`, true) : Promise.resolve(),
+//   ]);
+// }
 
-export function cleanManyMigrations(oldIds, newIds) {
-  return Promise.all([
-    // oldIds.length > 0
-    //   ? performQuery(`UPDATE companies SET mongo_id="" WHERE company_id IN (${oldIds.join(',')});`)
-    //   : Promise.resolve(),
-    newIds.length > 0
-      ? deleteManyImages(
-          newIds.map((item) => `${item}.jpeg`),
-          true
-        )
-      : Promise.resolve(),
-  ]);
-}
+// export function cleanManyMigrations(oldIds, newIds) {
+//   return Promise.all([
+//     // oldIds.length > 0
+//     //   ? performQuery(`UPDATE companies SET mongo_id="" WHERE company_id IN (${oldIds.join(',')});`)
+//     //   : Promise.resolve(),
+//     newIds.length > 0
+//       ? deleteManyImages(
+//           newIds.map((item) => `${item}.jpeg`),
+//           true
+//         )
+//       : Promise.resolve(),
+//   ]);
+// }
 
-export function cleanAllMigrations() {
-  return Promise.all([
-    // performQuery(`UPDATE companies SET mongo_id="";`),
-    // liveModel.deleteMany({}),
-    deleteAllImages('/company/', true),
-  ]);
-}
+// export function cleanAllMigrations() {
+//   return Promise.all([
+//     // performQuery(`UPDATE companies SET mongo_id="";`),
+//     // liveModel.deleteMany({}),
+//     deleteAllImages('/company/', true),
+//   ]);
+// }
 
 export async function migrateSingle(oldId) {
   try {
-    log.info(`ID #${oldId} | Checking past migration...`);
+    // log.info(`ID #${oldId} | Checking past migration...`);
     const [_oldLive] = await getRecord(oldId);
-    if (isValidObjectId(_oldLive.mongo_id)) {
-      const _deleteRecord = await liveModel.findById(_oldLive.mongo_id);
-      if (_deleteRecord) {
-        log.info(`ID #${oldId} | Found past migration! Cleaning...`);
-        await cleanSingleMigration(oldId, _oldLive.mongo_id);
-      } else {
-        log.info(`ID #${oldId} | No past migration found!`);
-      }
-    } else {
-      log.info(`ID #${oldId} | No past migration found!`);
-    }
+    // if (isValidObjectId(_oldLive.mongo_id)) {
+    //   const _deleteRecord = await liveModel.findById(_oldLive.mongo_id);
+    //   if (_deleteRecord) {
+    //     log.info(`ID #${oldId} | Found past migration! Cleaning...`);
+    //     await cleanSingleMigration(oldId, _oldLive.mongo_id);
+    //   } else {
+    //     log.info(`ID #${oldId} | No past migration found!`);
+    //   }
+    // } else {
+    //   log.info(`ID #${oldId} | No past migration found!`);
+    // }
 
     if (!(await companyModel.exists({ _id: _oldLive.company_mongo_id }))) {
       throw new Error('Company not found!');
@@ -187,11 +187,11 @@ export async function migrateMany(startId, endId) {
     const _oldRecords = await getListOfRecords(startId, endId);
     log.info(`Retrieved ${_oldRecords.length} live entries.`);
 
-    log.info(`Cleaning all past migrations...`);
-    await cleanManyMigrations(
-      _oldRecords.map((item) => item.live_id).filter((item) => item),
-      _oldRecords.map((item) => (item.mongo_id ? item.mongo_id : undefined)).filter((item) => item)
-    );
+    // log.info(`Cleaning all past migrations...`);
+    // await cleanManyMigrations(
+    //   _oldRecords.map((item) => item.live_id).filter((item) => item),
+    //   _oldRecords.map((item) => (item.mongo_id ? item.mongo_id : undefined)).filter((item) => item)
+    // );
 
     const _newRecords = [];
     await eachOfSeries(_oldRecords, async (oldRecord, index) => {
@@ -215,8 +215,8 @@ export async function migrateAll() {
     const _oldRecords = await getListOfRecords();
     log.info(`Retrieved ${_oldRecords.length} live entries.`);
 
-    log.info(`Cleaning all past migrations...`);
-    await cleanAllMigrations();
+    // log.info(`Cleaning all past migrations...`);
+    // await cleanAllMigrations();
 
     const _newRecords = [];
     await eachOfSeries(_oldRecords, async (oldRecord, index) => {
