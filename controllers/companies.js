@@ -96,7 +96,9 @@ export async function migrateSingle(oldId) {
     const _formattedCompany = convertRecordToDocument(_oldCompany, undefined);
 
     log.info(`ID #${oldId} | Storing processed company...`);
-    const _newCompany = await createDocument(_formattedCompany);
+    const _newCompany = (await companyModel.exists({ _id: _oldCompany.mongo_id }))
+      ? await updateDocument(_oldCompany.mongo_id, _formattedCompany)
+      : await createDocument(_formattedCompany);
 
     log.info(`ID #${oldId} | Migrating company logo...`);
     const _companyLogo = _oldCompany.company_avatar
