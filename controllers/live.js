@@ -4,7 +4,6 @@ import companyModel from '../models/company.model.js';
 import liveModel from '../models/live.model.js';
 
 import { performQuery } from '../config/mysql.js';
-import { isValidObjectId } from '../config/mongoose.js';
 
 import Logger from '../utils/winston.js';
 const log = new Logger('Companies Migrate');
@@ -66,7 +65,7 @@ const _branchMap = {
 };
 
 function parseStudentsRecruited(studentsRecruited) {
-  const _parsedStudents = parseJSON(studentsRecruited);
+  const _parsedStudents = JSON.parse(studentsRecruited);
   let _students = [];
   for (let _degree in _parsedStudents) {
     let _degreeStudents = _parsedStudents[_degree].map((branch) => {
