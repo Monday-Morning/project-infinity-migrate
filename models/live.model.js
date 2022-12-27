@@ -153,8 +153,12 @@ const LiveSchema = new mongoose.Schema(
 );
 
 LiveSchema.virtual('internshipDuration')
-  .get(() => this.benefits)
-  .set((x) => (this.benefits = x));
+  .get(function () {
+    return this.type === 4 ? this.benefits ?? 'N/A' : 'N/A';
+  })
+  .set(function (x) {
+    if (this.type === 4) this.benefits = x;
+  });
 
 /**
  * @description Generated Live Model
