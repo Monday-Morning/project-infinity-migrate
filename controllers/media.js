@@ -160,6 +160,30 @@ export async function deleteAllImages(folderPath, newStore, recordLinkedTo) {
   }
 }
 
+export async function migrateCompanyLogo(imageUrl, id) {
+  try {
+    log.info(`Parsing image url...`);
+    const _newFileName = `${id}.jpeg`;
+
+    log.info(`Downloading image...`);
+    const _imageBuffer = await downloadImage(imageUrl);
+
+    log.info(`Convering to progressive jpeg...`);
+    const _convertedImageBuffer = await convertToJpeg(_imageBuffer);
+
+    log.info(`Processing document...`);
+    const _newMediaDocument = await convertRecordToDocument(id, 'company', _convertedImageBuffer, _newFileName, true);
+
+    log.info(`Uploading image...`);
+    await uploadImage('company', _convertedImageBuffer, _newFileName, ['company', [], true], true);
+    log.info(`Image Uploaded.`);
+    return _newMediaDocument;
+  } catch (error) {
+    log.error(`Could not migrate company logo: `, error);
+    return null;
+  }
+}
+
 export async function migrateProfilePicture(imageUrl, id) {
   try {
     log.info(`Parsing image url...`);
