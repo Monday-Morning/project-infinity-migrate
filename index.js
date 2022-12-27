@@ -30,6 +30,11 @@ import {
   cleanSingleMigration as cleanSinglePhotostoryMigration,
 } from './controllers/photostory.js';
 import { migrateSingle as migrateSingleIssue } from './controllers/issue.js';
+import {
+  migrateSingle as migrateSingleCompany,
+  migrateMany as migrateManyCompanies,
+  migrateAll as migrateAllCompanies,
+} from './controllers/companies.js';
 import { checkServer, reloadServer } from './controllers/server.js';
 
 const app = express();
@@ -117,6 +122,17 @@ app.use('/photostory/clean/single/:oldId/:newId', (req, res) =>
  */
 app.use('/issue/migrate/single/:issueId', (req, res) =>
   requestHandler(migrateSingleIssue(parseInt(req.params.issueId)), res)
+);
+
+/**
+ * Company Migration Endpoints
+ */
+app.use('/company/migrate/all', (_req, res) => requestHandler(migrateAllCompanies(), res));
+app.use('/company/migrate/single/:companyId', (req, res) =>
+  requestHandler(migrateSingleCompany(req.params.companyId), res)
+);
+app.use('/company/migrate/many/:startId/:endId', (req, res) =>
+  requestHandler(migrateManyCompanies(req.params.startId, req.params.endId), res)
 );
 
 /**

@@ -76,7 +76,7 @@ export function cleanAllMigrations() {
   ]);
 }
 
-export async function migrateSingleCompany(oldId) {
+export async function migrateSingle(oldId) {
   try {
     log.info(`ID #${oldId} | Checking past migration...`);
     const [_oldCompany] = await getRecord(oldId);
