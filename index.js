@@ -7,6 +7,7 @@ const log = new Winston('Main');
 
 // Import all modules
 import express from 'express';
+import cors from 'cors';
 import './config/mongoose.js';
 import './config/mysql.js';
 import {
@@ -43,6 +44,19 @@ import {
 import { checkServer, reloadServer } from './controllers/server.js';
 
 const app = express();
+
+const whitelist = ['https://mondaymorning.nitrkl.ac.in', 'https://mm.server1.dashnet.in'];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  })
+);
 
 async function requestHandler(methodResponse, sendResponse) {
   const _res = await methodResponse;
