@@ -19,7 +19,7 @@
     "moment": "^2.29.3",
     "mongoose": "^6.3.4",
     "mysql": "^2.18.1",
-    "node-fetch": "^3.2.4",
+    "node-fetch": "^3.2.10",
     "node-html-markdown": "^1.2.0",
     "pm2": "^5.2.0",
     "sharp": "^0.30.6",
